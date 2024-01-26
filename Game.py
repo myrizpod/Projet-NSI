@@ -63,7 +63,7 @@ class Game:
         player_pos[2]-=1
 
 
-      if terrain[-1][0]-screen_size[0]*10<=player_pos[0]*10:
+      if terrain[-1][0]-screen_size[0]*10<=(player_pos[0]+50)*10:
         self.gen_terrain(1)
 
       if pyxel.btnp(pyxel.KEY_P):
@@ -91,7 +91,7 @@ class Game:
       coin_distance+=player_pos[4]
       if coin_distance>coin_distance_min and random.random()<0.02*player_pos[4]:
         coin_distance=0
-        for i in range(0,random.randint(3,8)*10,10):
+        for i in range(0,random.randint(3,10)*8,8):
           pointA,pointB=terrain[self.find_next_point(player_pos[0]+screen_size[0]+i)-1],terrain[self.find_next_point(player_pos[0]+screen_size[0]+i)]
           y=int(pointB[1]/10-self.terrain_y(pointB[0]-((player_pos[0]+screen_size[0]+i)*10),pointA,pointB)/10)
           coin_list.append(coin(player_pos[0]+246+i,y-8))
@@ -150,6 +150,7 @@ class Game:
     for i in range(len(terrain)):
       if terrain[i][0]>=x*10:
         return i
+    return len(terrain)-1 
 
   def terrain_y(self,x,pointA,pointB):
     return (pointB[1]-pointA[1])*((math.cos(((x/(pointB[0]-pointA[0]))*math.pi)-math.pi)+1)/2)  
@@ -193,7 +194,7 @@ class Game:
       self.draw_scarf(8)
       self.draw_player()
       self.neige_draw()
-     
+      pyxel.text(cam[0],cam[1],"Coins: ",10)
       score+=player_pos[4]
       pyxel.text(cam[0]+screen_size[0]-19-len(str(int(score)))*4,cam[1],'Score:'+str(int(score/10)),1)
       pyxel.text(cam[0]+screen_size[0]-20-len(str(int(score)))*4,cam[1],'Score:'+str(int(score/10)),9)
