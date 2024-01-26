@@ -12,6 +12,7 @@ print("Press Q to quit (and save info)")
 print("Press E/R to slow down/speed up | debug only")
 print("Press T to plop obstacle at the player | debug too")
 import pyxel
+import time
 import math
 import random
 
@@ -90,9 +91,10 @@ class Game:
       coin_distance+=player_pos[4]
       if coin_distance>coin_distance_min and random.random()<0.02*player_pos[4]:
         coin_distance=0
-        pointA,pointB=terrain[self.find_next_point(player_pos[0]+screen_size[0])-1],terrain[self.find_next_point(player_pos[0]+screen_size[0])]
-        y=int(pointB[1]/10-self.terrain_y(pointB[0]-((player_pos[0]+screen_size[0])*10),pointA,pointB)/10)
-        coin_list.append(coin(player_pos[0]+246,y-8))
+        for i in range(0,random.randint(3,8)*10,10):
+          pointA,pointB=terrain[self.find_next_point(player_pos[0]+screen_size[0]+i)-1],terrain[self.find_next_point(player_pos[0]+screen_size[0]+i)]
+          y=int(pointB[1]/10-self.terrain_y(pointB[0]-((player_pos[0]+screen_size[0]+i)*10),pointA,pointB)/10)
+          coin_list.append(coin(player_pos[0]+246+i,y-8))
 
 
       if pyxel.btn(pyxel.KEY_E):
@@ -225,8 +227,9 @@ class Game:
       """    
       global coin_list
       for coin in coin_list:
-        pyxel.rect(coin.pos[0], coin.pos[1],4,4,8)
-        pyxel.blt(coin.pos[0], coin.pos[1], 0, 24, 8, 4, 4, 0)
+        pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
+        if pyxel.btn(pyxel.KEY_B):  
+          pyxel.rectb(coin.pos[0], coin.pos[1],4,4,8)
 
 
   def draw_player(self):
