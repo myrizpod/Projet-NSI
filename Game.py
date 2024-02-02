@@ -95,7 +95,11 @@ class Game:
         for i in range(0,random.randint(3,10)*8,8):
           pointA,pointB=terrain[self.find_next_point(player_pos[0]+screen_size[0]+i)-1],terrain[self.find_next_point(player_pos[0]+screen_size[0]+i)]
           y=int(pointB[1]/10-self.terrain_y(pointB[0]-((player_pos[0]+screen_size[0]+i)*10),pointA,pointB)/10)
-          coin_list.append(coin(player_pos[0]+246+i,y-8))
+          if random.random()<0.05: 
+            coin_list.append(coin(player_pos[0]+246+i,y-8,5))
+          else:
+            coin_list.append(coin(player_pos[0]+246+i,y-8,1))
+            
 
 
       if pyxel.btn(pyxel.KEY_E):
@@ -149,7 +153,7 @@ class Game:
         if not coi.picked_up:
           for i in range(0,9):
             if coi.pos[0]<player_pos[0]+i<coi.pos[0]+4 and coi.pos[1]<player_pos[1]+i<coi.pos[1]+4:
-              pieces+=1
+              pieces+=coi.value
               coi.pickup()
               break      
 
@@ -218,7 +222,7 @@ class Game:
         pyxel.text(cam[0],cam[1],'Grounded',8)
       if dead:
         alpha=max(0,alpha-0.05)
-        player_pos[4]=max(0,player_pos[4]-0.05)
+        player_pos[4]=max(0,player_pos[4]-0.1)
         pyxel.text(50+cam[0], 50+cam[1], 'U dead', 8)
         pyxel.dither(alpha)
 
@@ -251,7 +255,11 @@ class Game:
         if coin.momentum<=-5:
           to_be_deleted.append(c)
         coin.pos[1]-=coin.momentum
-        pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
+        if coin.value==1:
+          pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
+        if coin.value==5:
+          pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 12, 4, 4, 0)
+
         if pyxel.btn(pyxel.KEY_B):  
           pyxel.rectb(coin.pos[0], coin.pos[1],4,4,8)
       for n in to_be_deleted:
@@ -395,8 +403,9 @@ class obstacle:
     self.pos=self.original_pos  
 
 class coin:
-  def __init__(self,x,y):
+  def __init__(self,x,y,value):
     self.pos=[x,y]
+    self.value=value
     self.momentum=0
     self.picked_up=False
   def pickup(self):
