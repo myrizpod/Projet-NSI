@@ -271,7 +271,9 @@ class Game:
     """    
     global pdir  
     rotframes=[[0, 32],[0, 40],[ 0, 48],[ 0, 56],[8, 32],[8, 40],[8, 48],[8, 56]] # sprites for player rotation range([0,7])
+    pyxel.blt(player_pos[0], player_pos[1], 0, rotframes[int(pdir)][0]+16, rotframes[int(pdir)][1], 8, 8, 0)
     pyxel.blt(player_pos[0], player_pos[1], 0, rotframes[int(pdir)][0], rotframes[int(pdir)][1], 8, 8, 0)
+    pyxel.blt(player_pos[0], player_pos[1], 0, rotframes[int(pdir)][0]+32, rotframes[int(pdir)][1], 8, 8, 0)
     if pyxel.btn(pyxel.KEY_B):  
         pyxel.rectb(player_pos[0],player_pos[1],8,8,11)
  
