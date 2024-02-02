@@ -143,7 +143,6 @@ class Game:
 
   def detect_collision_coins(self):
     global player_pos, coin_list, pieces
-    pieces=0
     if not dead:
       for c in range(len(coin_list)):
         coi=coin_list[c]
@@ -210,7 +209,8 @@ class Game:
       self.draw_scarf(8)
       self.draw_player()
       self.neige_draw()
-      pyxel.text(cam[0],cam[1],"Coins: ",10)
+      pyxel.text(cam[0]+1,cam[1],"Coins: "+str(pieces),1)
+      pyxel.text(cam[0],cam[1],"Coins: "+str(pieces),10)
       score+=player_pos[4]
       pyxel.text(cam[0]+screen_size[0]-19-len(str(int(score)))*4,cam[1],'Score:'+str(int(score/10)),1)
       pyxel.text(cam[0]+screen_size[0]-20-len(str(int(score)))*4,cam[1],'Score:'+str(int(score/10)),9)
