@@ -33,6 +33,7 @@ pdir=0 #direction of the player in range [0;8[ with 0/8=forward,2=up,4=backward 
 obstacle_distance=0 #distance from the last obstacle
 obstacle_distance_min=200 #minimum distance between two obstacles
 score=0 #score of the player
+pieces=0 #number of coins of the playerz
 snow_col=[None,12,6,7] #colors for different snowflake layers
 coin_distance=0
 coin_distance_min=100
@@ -113,7 +114,8 @@ class Game:
           player_pos[3]=-2
         else:
           pdir=(pdir+0.15)%8  
-      self.detect_collisions_obstacles()  
+      self.detect_collisions_obstacles()
+      self.detect_collision_coins()  
 
   def die(self):
     global dead,alpha
@@ -139,6 +141,20 @@ class Game:
             self.die()
             break
 
+  def detect_collision_coins(self):
+    global player_pos, coin_list, pieces
+    pieces=0
+    if not dead:
+      for c in range(len(coin_list)):
+        coi=coin_list[c]
+        if not coi.picked_up:
+          for i in range(0,9):
+            if coi.pos[0]<player_pos[0]+i<coi.pos[0]+4 and coi.pos[1]<player_pos[1]+i<coi.pos[1]+4:
+              pieces+=1
+              coi.pickup()
+              break      
+
+            
 
   def update_player_points(self):
     global terrain,player_pos
@@ -227,10 +243,19 @@ class Game:
       """draws each coin at its position
       """    
       global coin_list
-      for coin in coin_list:
+      to_be_deleted=[]
+      for c in range(len(coin_list)):
+        coin=coin_list[c]
+        if coin.picked_up:
+          coin.momentum-=1
+        if coin.momentum<=-5:
+          to_be_deleted.append(c)
+        coin.pos[1]-=coin.momentum
         pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
         if pyxel.btn(pyxel.KEY_B):  
           pyxel.rectb(coin.pos[0], coin.pos[1],4,4,8)
+      for n in to_be_deleted:
+        coin_list.pop(n)  
 
 
   def draw_player(self):
@@ -372,6 +397,12 @@ class obstacle:
 class coin:
   def __init__(self,x,y):
     self.pos=[x,y]
+    self.momentum=0
+    self.picked_up=False
+  def pickup(self):
+    self.momentum=5
+    self.picked_up=True
+
 
 
 Game()
