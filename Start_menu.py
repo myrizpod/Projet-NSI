@@ -17,9 +17,10 @@ colcontourschaud=8#initial=8
 btnchaud=10#initial=10
 btncchaud=14#initial=14
 colparamètres=13
+colparamètresok=4
 volume=3
 musique=2
-mode, bg, colfond, colcontours, btn, btnc, fenêtreskin, fenêtreniveaux, fenêtreparamètre, volumemusic, volumesons="hiver", bgfroid, colfondfroid, colcontoursfroid, btnfroid, btncfroid, False, False, False, 3, 3
+mode, bg, colfond, colcontours, btn, btnc, fenêtreskin, fenêtreniveaux, fenêtreparamètre="hiver", bgfroid, colfondfroid, colcontoursfroid, btnfroid, btncfroid, False, False, False
 class Game:
     def __init__(self):
         pyxel.init(screensize[0], screensize[1])
@@ -31,14 +32,13 @@ class Game:
         global pos, e, mode, bg, colfond, colcontours, bgchaud, colfondchaud, colcontourschaud, bgfroid, colfondfroid, colcontoursfroid, btn, btnc, btnfroid, btnchaud, btncfroid, btncchaud, fenêtreskin, fenêtreniveaux, fenêtreparamètre
         pos=[pyxel.mouse_x,pyxel.mouse_y]
         #Détéction clic bouton mode
-        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and mode=="hiver" and pos[0]>=coox+width-5 and pos[0]<=coox+width-4+3 and pos[1]>=cooy+height-7 and pos[1]<=cooy+height-3:
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and mode=="hiver" and pos[0]>=coox+width-5 and pos[0]<=coox+width-4+3 and pos[1]>=cooy+height-7 and pos[1]<=cooy+height-3 and fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
             mode, bg, colfond, colcontours, btn, btnc="été", bgchaud, colfondchaud, colcontourschaud, btnchaud, btncchaud
-        elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and mode=="été" and pos[0]>=coox+width-6 and pos[0]<=coox+width and pos[1]>=cooy+height-8 and pos[1]<=cooy+height-2:
+        elif pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and mode=="été" and pos[0]>=coox+width-6 and pos[0]<=coox+width and pos[1]>=cooy+height-8 and pos[1]<=cooy+height-2 and fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
             mode, bg, colfond, colcontours, btn, btnc="hiver", bgfroid, colfondfroid, colcontoursfroid, btnfroid, btncfroid
         #Détection clic bouton paramètre
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and pos[0]>=coox+width-7 and pos[0]<=coox+width+1 and pos[1]>=cooy+2 and pos[1]<=cooy+10:
-            if fenêtreparamètre==False:
-                fenêtreparamètre=True
+            if fenêtreparamètre==False:fenêtreparamètre=True
             else:fenêtreparamètre=False
     def draw(self):
         #self.terrain()
@@ -63,46 +63,88 @@ class Game:
     def start_menu(self):
         global mode, coox, cooy, width, height, bg, colfond, colcontours, btn, btnc
         
-        pyxel.cls(bg)#fond
+        #fond
+        pyxel.cls(bg)
+
         #fond menu
         self.bg_menu()
+
         #contours blancs
         self.outlines_menu()
         
         #bouton start
-        self.start_button_menu()
+        if fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
+            start="START"
+            if pos[0]>=coox+(width+2)/2-int((len(start)*3)/2+len(start)/2-1) and pos[0]<=coox+(width+2)/2+int((len(start)*3)/2+len(start)/2-1) and pos[1]>=cooy+height/2-2 and pos[1]<=cooy+height/2+3:
+                self.start_button_menu(start, btnc)
+            else: self.start_button_menu(start, btn)
 
         #bouton skin
-        self.skin_button_menu()
+        if fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
+            skin="Skins"
+            if pos[0]>=coox+4 and pos[0]<coox+4+len(skin)*3+len(skin)-1 and pos[1]>=cooy+4 and pos[1]<cooy+4+5:
+                self.skin_button_menu(skin, btnc)
+            else:self.skin_button_menu(skin, btn)
 
         #bouton niveaux
-        self.level_button_menu()
+        if fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
+            level="Level"
+            if pos[0]>=coox+4 and pos[0]<coox+4+len(level)*3+len(level)-1 and pos[1]>=cooy+height+1-4-5 and pos[1]<cooy+height+1-4:
+                self.level_button_menu(level, btnc)
+            else:self.level_button_menu(level, btn)
 
         #bouton paramètre
-        #graphique + détection de la souris
-        if fenêtreskin==False and fenêtreniveaux==False:
-            self.settings_button_menu()
-            #affichage des différents paramètres
-            if fenêtreparamètre==True:
-                #bouton volume
-                self.volume_sound_settings_menu()
-                
-                pyxel.line(coox+10,cooy+5,coox+10,cooy+8,colparamètres)
-                pyxel.line(coox+12,cooy+5,coox+12,cooy+8,colparamètres)
-                pyxel.line(coox+14,cooy+5,coox+14,cooy+8,colparamètres)
-                pyxel.line(coox+16,cooy+5,coox+16,cooy+8,colparamètres)
-                #bouton musique
-                self.volume_music_settings_menu()
-
-                pyxel.line(10,45,10,48,colparamètres)
-                pyxel.line(12,45,12,48,colparamètres)
-                pyxel.line(14,45,14,48,colparamètres)
-                pyxel.line(16,45,16,48,colparamètres)
-
+        if fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
+            if pos[0]>=coox+width-3-4 and pos[0]<=coox+width-3+4 and pos[1]>=cooy+6-4 and pos[1]<=cooy+6+4:
+                self.settings_button_menu(btnc)
+            else: self.settings_button_menu(btn)
 
         #bouton modes (lune pour hiver & soleil pour été)
-        if fenêtreskin==False and fenêtreniveaux==False and fenêtreparamètre==False:
-            self.mode_button_menu()
+        if fenêtreniveaux==False and fenêtreparamètre==False and fenêtreskin==False:
+            if pos[0]>=coox+width-5 and pos[0]<=coox+width-4+3 and pos[1]>=cooy+height-7 and pos[1]<=cooy+height-3:
+                self.mode_button_menu(mode, btnc)
+            else: self.mode_button_menu(mode, btn)
+
+        #affichage des différents paramètres
+        if fenêtreparamètre==True:
+            self.settings_button_menu(btnc)
+
+            #bouton volume
+            if volume !=0: self.volume_sound_settings_menu(colparamètresok)
+            else: self.volume_sound_settings_menu(colparamètres)
+
+            if volume>=1:
+                pyxel.line(coox+10,cooy+5,coox+10,cooy+8,colparamètresok)
+            else: pyxel.line(coox+10,cooy+5,coox+10,cooy+8,colparamètres)
+            if volume>=3:
+                pyxel.line(coox+12,cooy+5,coox+12,cooy+8,colparamètresok)
+            else: pyxel.line(coox+12,cooy+5,coox+12,cooy+8,colparamètres)
+            if volume>=5:
+                pyxel.line(coox+14,cooy+5,coox+14,cooy+8,colparamètresok)
+            else: pyxel.line(coox+14,cooy+5,coox+14,cooy+8,colparamètres)
+            if volume==7:
+                pyxel.line(coox+16,cooy+5,coox+16,cooy+8,colparamètresok)
+            else: pyxel.line(coox+16,cooy+5,coox+16,cooy+8,colparamètres)
+
+            #bouton musique
+            if musique!=0: self.volume_music_settings_menu(colparamètresok)
+            else: self.volume_music_settings_menu(colparamètres)
+
+            if musique>=1:
+                pyxel.line(coox+10,cooy+16,10,cooy+19,colparamètresok)
+            else: pyxel.line(coox+10,cooy+16,10,cooy+19,colparamètres)
+            if musique>=3:
+                pyxel.line(coox+12,cooy+16,12,cooy+19,colparamètresok)
+            else: pyxel.line(coox+12,cooy+16,12,cooy+19,colparamètres)
+            if musique>=5:
+                pyxel.line(coox+14,cooy+16,14,cooy+19,colparamètresok)
+            else: pyxel.line(coox+14,cooy+16,14,cooy+19,colparamètres)
+            if musique==7:
+                pyxel.line(coox+16,cooy+16,16,cooy+19,colparamètresok)
+            else: pyxel.line(coox+16,cooy+16,16,cooy+19,colparamètres)
+
+
+        
 
     def bg_menu(self):
         pyxel.rect(coox+2, cooy+1, width, height,colfond)#rectangle principal
@@ -119,78 +161,47 @@ class Game:
         pyxel.pset(coox+1,cooy+height,colcontours)#coin inférieur gauche
         pyxel.pset(coox+2+width,cooy+height,colcontours)#coin inférieur droit
 
-    def start_button_menu(self):
-        start="START"
-        if pos[0]>=coox+(width+2)/2-int((len(start)*3)/2+len(start)/2-1) and pos[0]<=coox+(width+2)/2+int((len(start)*3)/2+len(start)/2-1) and pos[1]>=cooy+height/2-2 and pos[1]<=cooy+height/2+3:
-            pyxel.text(coox+(width+2)/2-int((len(start)*3)/2+len(start)/2-1),cooy+height/2-2,start,btnc)
-        else:pyxel.text(coox+(width+2)/2-int((len(start)*3)/2+len(start)/2-1),cooy+height/2-2,start,btn)
+    def start_button_menu(self, text, col):
+        pyxel.text(coox+(width+2)/2-int((len(text)*3)/2+len(text)/2-1),cooy+height/2-2,text,col)
     
-    def skin_button_menu(self):
-        skin="Skins"
-        if pos[0]>=coox+4 and pos[0]<coox+4+len(skin)*3+len(skin)-1 and pos[1]>=cooy+4 and pos[1]<cooy+4+5:
-            pyxel.text(coox+4,cooy+4,skin,btnc)
-        else: pyxel.text(coox+4,cooy+4,skin,btn)
+    def skin_button_menu(self, text, col):
+        pyxel.text(coox+4,cooy+4,text,col)
     
-    def level_button_menu(self):
-        level="Level"
-        if pos[0]>=coox+4 and pos[0]<coox+4+len(level)*3+len(level)-1 and pos[1]>=cooy+height+1-4-5 and pos[1]<cooy+height+1-4:
-            pyxel.text(coox+4,cooy+height+1-4-5,level,btnc)
-        else:pyxel.text(coox+4,cooy+height+1-4-5,level,btn)
+    def level_button_menu(self, text, col):
+        pyxel.text(coox+4,cooy+height+1-4-5,text,col)
     
-    def settings_button_menu(self):
-        if pos[0]>=coox+width-3-4 and pos[0]<=coox+width-3+4 and pos[1]>=cooy+6-4 and pos[1]<=cooy+6+4:
-            pyxel.circb(coox+width-3,cooy+6,2,btnc)
-            pyxel.circb(coox+width-3,cooy+6,4,btnc)
-        else:
-            pyxel.circb(coox+width-3,cooy+6,2,btn)
-            pyxel.circb(coox+width-3,cooy+6,4,btn)
+    def settings_button_menu(self, col):
+            pyxel.circb(coox+width-3,cooy+6,2,col)
+            pyxel.circb(coox+width-3,cooy+6,4,col)
     
-    def mode_button_menu(self):
+    def mode_button_menu(self, mode, col):
         if mode=="hiver":
-            if pos[0]>=coox+width-5 and pos[0]<=coox+width-4+3 and pos[1]>=cooy+height-7 and pos[1]<=cooy+height-3:
-                pyxel.line(coox+width-4,cooy+height-3,coox+width-4+3,cooy+height-3,btnc)
-                pyxel.line(coox+width-5,cooy+height-7,coox+width-5,cooy+height-4,btnc)
-                pyxel.pset(coox+width-4,cooy+height-5,btnc)
-                pyxel.pset(coox+width-4,cooy+height-4,btnc)
-                pyxel.pset(coox+width-3,cooy+height-4,btnc)
-            else:
-                pyxel.line(coox+width-4,cooy+height-3,coox+width-4+3,cooy+height-3,btn)
-                pyxel.line(coox+width-5,cooy+height-7,coox+width-5,cooy+height-4,btn)
-                pyxel.pset(coox+width-4,cooy+height-5,btn)
-                pyxel.pset(coox+width-4,cooy+height-4,btn)
-                pyxel.pset(coox+width-3,cooy+height-4,btn)
+            pyxel.line(coox+width-4,cooy+height-3,coox+width-4+3,cooy+height-3,col)
+            pyxel.line(coox+width-5,cooy+height-7,coox+width-5,cooy+height-4,col)
+            pyxel.pset(coox+width-4,cooy+height-5,col)
+            pyxel.pset(coox+width-4,cooy+height-4,col)
+            pyxel.pset(coox+width-3,cooy+height-4,col)
         else:
-            if pos[0]>=coox+width-6 and pos[0]<=coox+width and pos[1]>=cooy+height-8 and pos[1]<=cooy+height-2:
-                pyxel.rect(coox+width-5,cooy+height-7,5,5,btnc)
-                pyxel.line(coox+width-7,cooy+height-5,coox+width-6,cooy+height-5,btnc)
-                pyxel.line(coox+width,cooy+height-5,coox+width+1,cooy+height-5,btnc)
-                pyxel.line(coox+width-3,cooy+height-9,coox+width-3,cooy+height-8,btnc)
-                pyxel.line(coox+width-3,cooy+height-2,coox+width-3,cooy+height-1,btnc)
-                pyxel.line(coox+width-5,cooy+height-7,coox+width-6,cooy+height-8,btnc)
-                pyxel.line(coox+width-1,cooy+height-7,coox+width,cooy+height-8,btnc)
-                pyxel.line(coox+width-5,cooy+height-3,coox+width-6,cooy+height-2,btnc)
-                pyxel.line(coox+width-1,cooy+height-3,coox+width,cooy+height-2,btnc)
-            else:
-                pyxel.rect(coox+width-5,cooy+height-7,5,5,10)
-                pyxel.line(coox+width-7,cooy+height-5,coox+width-6,cooy+height-5,9)
-                pyxel.line(coox+width,cooy+height-5,coox+width+1,cooy+height-5,9)
-                pyxel.line(coox+width-3,cooy+height-9,coox+width-3,cooy+height-8,9)
-                pyxel.line(coox+width-3,cooy+height-2,coox+width-3,cooy+height-1,9)
-                pyxel.line(coox+width-5,cooy+height-7,coox+width-6,cooy+height-8,9)
-                pyxel.line(coox+width-1,cooy+height-7,coox+width,cooy+height-8,9)
-                pyxel.line(coox+width-5,cooy+height-3,coox+width-6,cooy+height-2,9)
-                pyxel.line(coox+width-1,cooy+height-3,coox+width,cooy+height-2,9)
+            pyxel.rect(coox+width-5,cooy+height-7,5,5,col)
+            pyxel.line(coox+width-7,cooy+height-5,coox+width-6,cooy+height-5,col)
+            pyxel.line(coox+width,cooy+height-5,coox+width+1,cooy+height-5,col)
+            pyxel.line(coox+width-3,cooy+height-9,coox+width-3,cooy+height-8,col)
+            pyxel.line(coox+width-3,cooy+height-2,coox+width-3,cooy+height-1,col)
+            pyxel.line(coox+width-5,cooy+height-7,coox+width-6,cooy+height-8,col)
+            pyxel.line(coox+width-1,cooy+height-7,coox+width,cooy+height-8,col)
+            pyxel.line(coox+width-5,cooy+height-3,coox+width-6,cooy+height-2,col)
+            pyxel.line(coox+width-1,cooy+height-3,coox+width,cooy+height-2,col)
     
-    def volume_sound_settings_menu(self):
-        pyxel.rect(coox+5,cooy+5,2,4,13)
-        pyxel.line(coox+7,cooy+4,coox+7,cooy+9,colparamètres)
-        pyxel.line(coox+8,cooy+3,coox+8,cooy+10,colparamètres)
+    def volume_sound_settings_menu(self, col):
+        pyxel.rect(coox+5,cooy+5,2,4,col)
+        pyxel.line(coox+7,cooy+4,coox+7,cooy+9,col)
+        pyxel.line(coox+8,cooy+3,coox+8,cooy+10,col)
 
-    def volume_music_settings_menu(self):
-        pyxel.line(2,48,2,49,colparamètres)
-        pyxel.rect(3,47,2,4,colparamètres)
-        pyxel.line(5,49,5,41,colparamètres)
-        pyxel.line(6,42,7,43,colparamètres)
-        pyxel.line(6,43,8,45,colparamètres)
+    def volume_music_settings_menu(self, col):
+        pyxel.line(coox+2,cooy+19,coox+2,cooy+20,col)
+        pyxel.rect(coox+3,cooy+18,2,4,col)
+        pyxel.line(coox+5,cooy+20,coox+5,cooy+12,col)
+        pyxel.line(coox+6,cooy+13,coox+7,cooy+14,col)
+        pyxel.line(coox+6,cooy+14,coox+8,cooy+16,col)
 
 Game()
