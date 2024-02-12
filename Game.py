@@ -22,7 +22,7 @@ import random
 
 
 #Main class
-class Game:
+class GameEngine:
 
 
   def __init__(self):
@@ -51,11 +51,8 @@ class Game:
     self.coin_distance=0
     self.coin_distance_min=100
     self.is_paused=False
-    pyxel.init(self.screen_size[0], self.screen_size[1],"Ski Game",30)
-    pyxel.load("textures.pyxres")
-    pyxel.run(self.update, self.draw)
 
-  def update(self):
+  def game_update(self):
     if self.dead:
       if pyxel.btnp(pyxel.KEY_R):
         self.__init__()
@@ -229,7 +226,7 @@ class Game:
       self.player_pos[1]=(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-8
     self.player_pos[1]+=self.player_pos[3]
  
-  def draw(self):
+  def game_draw(self):
     """
     Draws all visible elements on the scree including text (score,coins,death)
     """
@@ -448,6 +445,3 @@ class coin:
     self.momentum=5
     self.picked_up=True
 
-
-
-Game()
