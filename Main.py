@@ -1,5 +1,5 @@
 from Game import *
-from Menu import *
+from Start_menu import *
 game=GameEngine()
 menu=MenuEngine()
 import pyxel

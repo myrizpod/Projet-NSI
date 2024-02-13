@@ -1,6 +1,6 @@
 import pyxel
 
-class Game:
+class MenuEngine:
     def __init__(self):
         self.screensize=[256,128]
         self.mousecol, self.mousex, self.mousey=0, 0, 0
@@ -24,10 +24,8 @@ class Game:
         self.volume=3
         self.musique=2
         self.mode, self.bg, self.colfond, self.colcontours, self.btn, self.btnc, self.fenêtreskin, self.fenêtreniveaux, self.fenêtreparamètre="hiver", self.bgfroid, self.colfondfroid, self.colcontoursfroid, self.btnfroid, self.btncfroid, False, False, False
-        pyxel.init(self.screensize[0], self.screensize[1])
-        pyxel.run(self.update, self.draw)
 
-    def update(self):
+    def menu_update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
         self.pos=[pyxel.mouse_x,pyxel.mouse_y]
@@ -40,7 +38,7 @@ class Game:
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.pos[0]>=self.coox+self.width-7 and self.pos[0]<=self.coox+self.width+1 and self.pos[1]>=self.cooy+2 and self.pos[1]<=self.cooy+10:
             if self.fenêtreparamètre==False:self.fenêtreparamètre=True
             else:self.fenêtreparamètre=False
-    def draw(self):
+    def menu_draw(self):
         #self.terrain()
         #self.draw_scarf(8)
         self.start_menu()
@@ -200,5 +198,3 @@ class Game:
         pyxel.line(self.coox+5,self.cooy+20,self.coox+5,self.cooy+12,col)
         pyxel.line(self.coox+6,self.cooy+13,self.coox+7,self.cooy+14,col)
         pyxel.line(self.coox+6,self.cooy+14,self.coox+8,self.cooy+16,col)
-
-Game()
