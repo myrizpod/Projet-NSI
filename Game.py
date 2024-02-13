@@ -53,10 +53,13 @@ class GameEngine:
     self.is_paused=False
 
   def game_update(self):
+    
     if self.dead:
       if pyxel.btnp(pyxel.KEY_R):
         self.__init__()
-
+        pyxel.pal()
+        self.dead=False
+    
     if pyxel.btnp(pyxel.KEY_P):
       if self.is_paused:
         self.is_paused=False
@@ -64,6 +67,8 @@ class GameEngine:
         self.is_paused=True
     if self.is_paused:
       return
+    
+    self.score+=self.player_pos[4]
     cam_offset=(30,50) #offset of the camera with the player
 
     if self.first_iteration==0:
@@ -79,13 +84,6 @@ class GameEngine:
 
     if self.terrain[-1][0]-self.screen_size[0]*10<=(self.player_pos[0]+50)*10:
       self.gen_terrain(1)
-
-    if pyxel.btnp(pyxel.KEY_U):
-      pyxel.pal()
-      pyxel.dither(1)
-      self.dead=False
-    
-
 
     if pyxel.btnp(pyxel.KEY_Q):
         print("Quitting")
@@ -193,7 +191,7 @@ class GameEngine:
     for i in range(len(self.terrain)):
       if self.terrain[i][0]>=x*10:
         return i
-    return len(self.terrain)-1 
+    return i
 
   def terrain_y(self,x,pointA,pointB):
     return (pointB[1]-pointA[1])*((math.cos(((x/(pointB[0]-pointA[0]))*math.pi)-math.pi)+1)/2)  
@@ -230,10 +228,7 @@ class GameEngine:
     """
     Draws all visible elements on the scree including text (score,coins,death)
     """
-    if self.is_paused:
-      pyxel.blt(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+20,1,0,0,80,16,0)
-      pyxel.text(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+40,"Press P to return",1)
-      return
+
     pyxel.cls(5)
     pyxel.camera(self.cam[0],self.cam[1]) #update camera to the position stored in the variable self.cam[X,Y]
     self.draw_terrain()
@@ -244,7 +239,9 @@ class GameEngine:
     self.neige_draw()
     pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
     pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
-    self.score+=self.player_pos[4]
+    if self.is_paused:
+      pyxel.blt(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+20,1,0,0,80,16,0)
+      pyxel.text(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+40,"Press P to return",1)
     pyxel.text(self.cam[0]+self.screen_size[0]-19-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),1)
     pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),9)
     if self.grounded and pyxel.btn(pyxel.KEY_B):
