@@ -27,6 +27,7 @@ class App:
             menu.menu_draw()   
 
     def update(self):
+        #switch between runing the menu and the game
         global inGame,menu,game
         if inGame:
             game.game_update()

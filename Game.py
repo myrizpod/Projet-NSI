@@ -32,7 +32,7 @@ class GameEngine:
     self.obstacle_list=[] #list of the obstacles present in the game. Should be obstacle class.
     self.coin_list=[] #list of the coins present in the game. Should be coin class.
     self.grounded=False #defines wether or not the player is grounded
-    self.cam=[0,-50] # position of the camera
+    self.cam=[-100,-50] # position of the camera
     self.scarfhate=0 #scarf end Y relative to player Y
     self.dead=False #if player is dead (for death screen)
     self.first_iteration=False #used for first iteration
@@ -69,7 +69,8 @@ class GameEngine:
     #quit if currently paused
     if self.is_paused:
       return
-    
+    #remove the mouse
+    pyxel.mouse(False)
     #camera movement for the beiginning animation
     self.cam_offset[0]=max(30,self.cam_offset[0]-self.cam_offset[0]/50)
     
@@ -411,10 +412,15 @@ class GameEngine:
 
     Args:
         i (int): position of self.snow_flake_list to update
-    """    
-    self.snow_flake_list[i][1]+=self.snow_flake_list[i][3]/2 #movement Y
-    self.snow_flake_list[i][0]-=self.snow_flake_list[i][3]/2 #movement X
-    self.snow_flake_list[i][2]-=1 #lower lifespan
+    """
+    if self.is_paused:
+      self.snow_flake_list[i][1]+=self.snow_flake_list[i][3]/10 #movement Y
+      self.snow_flake_list[i][0]-=self.snow_flake_list[i][3]/10 #movement X
+      self.snow_flake_list[i][2]-=0.2 #lower lifespan
+    else:  
+      self.snow_flake_list[i][1]+=self.snow_flake_list[i][3]/2 #movement Y
+      self.snow_flake_list[i][0]-=self.snow_flake_list[i][3]/2 #movement X
+      self.snow_flake_list[i][2]-=1 #lower lifespan
 
 class obstacle:  
   def __init__(self,x,y,type,variant=random.randint(0,3)):
