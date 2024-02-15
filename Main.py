@@ -1,30 +1,36 @@
 from Game import *
-from Start_menu import *
-game=GameEngine()
-menu=MenuEngine()
+from Menu import *
 import pyxel
-import time
-import math
-import random
+
+#Global variables
+inGame=False
+
+
 class App:
+    global game,menu
     def __init__(self):
+        global game,menu
+        #initializing game window (yes screen_size should be shared between all parts of the code. but i cant find a way to do it)
         self.screen_size=[256,128]
         pyxel.init(self.screen_size[0], self.screen_size[1],"Ski Game",30)
         pyxel.load("textures.pyxres")
+        #wierd place to initialise game and menu but needed otherwise pyxel gets mad
+        game=GameEngine()
+        menu=MenuEngine()
         pyxel.run(self.update, self.draw)
 
     def draw(self):
-        global game
-        if not pyxel.btn(pyxel.KEY_H):
-            game.game_draw()
-        else:
+        #choose wether or not menu should be shown
+        global inGame,menu,game
+        game.game_draw()
+        if not inGame:
             menu.menu_draw()   
 
     def update(self):
-        global game
-        if not pyxel.btn(pyxel.KEY_H):
+        global inGame,menu,game
+        if inGame:
             game.game_update()
         else:
-            menu.menu_update()
+            inGame=menu.menu_update()
         
 App()

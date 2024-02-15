@@ -2,14 +2,13 @@
 
 """
 Notes about the project ( bugs and other...):
--there's an issue with obstacle generation whet the player is too fast
+-there's an issue with obstacle generation when the player is too fast
 
 
 """
 #info and imports
 print("Launched Ü")
 print("Press Q to quit (and save info)")
-print("Press E/T to slow down/speed up | debug only")
 print("Press P to pause the game")
 print("Press U to respawn(debug only)")
 print("Press R to restart")
@@ -26,74 +25,82 @@ class GameEngine:
 
 
   def __init__(self):
-    """
-    Setup of the pyxel screen
-    """
+
     #Variable setup
     self.screen_size=[256,128] #constant, size of the screen [Height,Width]
-    self.terrain=list([[-500,0]]) #list of points that define the terrain, each point as [X,Y]
+    self.terrain=list([[-1500,0]]) #list of points that define the terrain, each point as [X,Y]
     self.obstacle_list=[] #list of the obstacles present in the game. Should be obstacle class.
-    self.coin_list=[]
-    self.grounded=False #defines wether or not the player is self.grounded
+    self.coin_list=[] #list of the coins present in the game. Should be coin class.
+    self.grounded=False #defines wether or not the player is grounded
     self.cam=[0,-50] # position of the camera
     self.scarfhate=0 #scarf end Y relative to player Y
-    self.dead=False #if player is self.dead (for death screen)
+    self.dead=False #if player is dead (for death screen)
     self.first_iteration=False #used for first iteration
     self.player_pos=[0,0,0,0,2] #player position info with [X,Y,indext of next closest point on terrain,downward momentum,forward momentum]
     self.terrain_size_mult=70 #defines how zoomed in is the terrain
-    self.snow_flake_list=[] # liste de la neige
+    self.snow_flake_list=[] # individual snow flakes
     self.pdir=0 #direction of the player in range [0;8[ with 0/8=forward,2=up,4=backward and 6=down
     self.obstacle_distance=0 #distance from the last obstacle
     self.obstacle_distance_min=200 #minimum distance between two obstacles
-    self.score=0 #self.score of the player
-    self.pieces=0 #number of coins of the playerz
+    self.score=0 #score of the player
+    self.pieces=0 #number of coins of the player
     self.snow_col=[None,12,6,7] #colors for different snowflake layers
-    self.coin_distance=0
-    self.coin_distance_min=100
+    self.coin_distance=0 #current distance between screen border and last coin patch
+    self.coin_distance_min=100 #minimum distance between two coin patches
     self.is_paused=False
-
+    self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
+    
+    #generation at the beiginning, to avoid holes
+    print("Starting Gen")
+    self.gen_terrain(self.screen_size[0]*10)
+    print("Added points")
+    
   def game_update(self):
+    """
+    the function that runs most of the game, but doesnt do graphics
+    """
     
-    if self.dead:
-      if pyxel.btnp(pyxel.KEY_R):
-        self.__init__()
-        pyxel.pal()
-        self.dead=False
-    
+    #check if player is trying to pause/unpause
     if pyxel.btnp(pyxel.KEY_P):
       if self.is_paused:
         self.is_paused=False
       else:
         self.is_paused=True
+    #quit if currently paused
     if self.is_paused:
       return
     
+    #camera movement for the beiginning animation
+    self.cam_offset[0]=max(30,self.cam_offset[0]-self.cam_offset[0]/50)
+    
+    #update score, quicker = more score/iteration
     self.score+=self.player_pos[4]
-    cam_offset=(30,50) #offset of the camera with the player
 
-    if self.first_iteration==0:
-      self.first_iteration=1
-      print("Starting Gen")
-      self.gen_terrain(self.screen_size[0]*10)
-      print("Added points")
-
-    if self.terrain[1][0]+cam_offset[0]*10+100<self.player_pos[0]*10:
+    #remove unused terrain points (behind the player)-
+    if self.terrain[1][0]+self.cam_offset[0]*10+100<self.player_pos[0]*10:
       self.terrain.pop(0)
+      #update player nearest terrain point
       self.player_pos[2]-=1
 
-
+    #generate new terrain points when needed
     if self.terrain[-1][0]-self.screen_size[0]*10<=(self.player_pos[0]+50)*10:
       self.gen_terrain(1)
 
+    #used properly quit the game (gonna use it for save files)
     if pyxel.btnp(pyxel.KEY_Q):
         print("Quitting")
         pyxel.quit()
 
+    
+    #Obstacle generation
+    #check if it can spawn a new obstacle (chances augment with the distance with the last obstacle)
     self.obstacle_distance+=self.player_pos[4]
     if self.obstacle_distance>self.obstacle_distance_min and random.random()<0.02*self.player_pos[4]:
       self.obstacle_distance=0
+      #calculate obstacle position
       pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])]
       y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0])*10),pointA,pointB)/10)
+      #choose a random obstacle type using the propper obstacle class
       r=random.random()
       if r>1/2:
         self.obstacle_list.append(obstacle(self.player_pos[0]+246,y-8,'rock'))
@@ -103,33 +110,35 @@ class GameEngine:
         self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'tree_snowy'))
 
       
-      #Randomly spawns 2 types of coins who have different values when picked up
       
+    #coin patch generaton
+    #check if it can spawn a new coin patch (chances augment with the distance with the last coin patch)
     self.coin_distance+=self.player_pos[4]
     if self.coin_distance>self.coin_distance_min and random.random()<0.02*self.player_pos[4]:
       self.coin_distance=0
+      #spawns multiple coins at once to make a patch
       for i in range(0,random.randint(3,10)*8,8):
+        #calculate obstacle position
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
+        #Randomly spawns 2 types of coins who have different values when picked up  
         if random.random()<0.05: 
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
         else:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1))
           
-
-
-    if pyxel.btn(pyxel.KEY_E):
-      self.player_pos[4]=max(0,self.player_pos[4]-0.1)
-
-    if pyxel.btn(pyxel.KEY_T):
-      self.player_pos[4]=min(10,self.player_pos[4]+0.1)
-
+    
     self.player_movement()
 
     self.update_player_points()
-    self.cam=[self.player_pos[0]-cam_offset[0],self.player_pos[1]-cam_offset[1]]
+    self.cam=[self.player_pos[0]-self.cam_offset[0],self.player_pos[1]-self.cam_offset[1]]
 
-    if pyxel.btn(pyxel.KEY_SPACE):
+    if pyxel.btnp(pyxel.KEY_SPACE) and self.dead:
+        self.__init__()
+        pyxel.pal()
+        self.dead=False
+    
+    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead:
       if self.grounded:
         self.player_pos[3]=-2
       else:
@@ -182,12 +191,17 @@ class GameEngine:
 
   def update_player_points(self):
     """
-    Updates the player's score based on his speed
+    Updates the player's nearest point based on its position
     """
     if self.terrain[self.player_pos[2]][0]<=self.player_pos[0]*10:
       self.player_pos[2]+=1
 
   def find_next_point(self,x):
+    """
+    find the next closest terrain point for a given location
+    
+      x(int): location to check for, in pixels, should not be greater than the current max terrain point 
+    """
     for i in range(len(self.terrain)):
       if self.terrain[i][0]>=x*10:
         return i
@@ -198,81 +212,103 @@ class GameEngine:
 
 
   def player_movement(self):
+    """a bunch of things to update player properties relative to the movement
+    """
+    #moves the player his speed
     self.player_pos[0]+=self.player_pos[4]
+    #calculates whether the player is grounded or not
     pointA,pointB=self.terrain[self.player_pos[2]-1],self.terrain[self.player_pos[2]]
     if int(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-8>self.player_pos[1]:
       self.grounded=False
+      #if not grounded, vertical speed goes up
       self.player_pos[3]+=0.1
     else:
       if not self.grounded:
+        #check if the player can properly land
         if self.pdir<1.5 or self.pdir>7.5:
           self.player_pos[4]+=1
           self.pdir=0
+        #otherwise die
         elif not self.dead:
-          self.die()      
+          self.die()
+      #land properly
       self.grounded=True
       self.player_pos[3]=min(0,self.player_pos[3])
 
+    #check if player should fall or not + tries to stick it to the ground
     if int(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-10<self.player_pos[1] and self.player_pos[3]>=0:
+      #reset downard speed when grounded
       self.player_pos[3]=0
       if not self.grounded:
         if self.pdir<1.5 or self.pdir>7.5:
           self.pdir=0
         elif not self.dead:
-          self.die()      
+          self.die()
       self.grounded=True
+      #tries to stick the player to the ground if close enough (so that light slopes feel smoother)
       self.player_pos[1]=(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-8
     self.player_pos[1]+=self.player_pos[3]
+
  
   def game_draw(self):
     """
     Draws all visible elements on the scree including text (score,coins,death)
     """
-
+    #clear the screen with blue sky
     pyxel.cls(5)
     pyxel.camera(self.cam[0],self.cam[1]) #update camera to the position stored in the variable self.cam[X,Y]
+    #refer to function docstring for more info
     self.draw_terrain()
     self.obstacles_draw()
     self.coins_draw()
     self.draw_scarf(8)
     self.draw_player()
-    self.neige_draw()
+    self.snow_draw()
+    #coin counter
     pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
     pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
+    #pause menu
     if self.is_paused:
-      pyxel.blt(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+20,1,0,0,80,16,0)
+      pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
       pyxel.text(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+40,"Press P to return",1)
+    #score counter
     pyxel.text(self.cam[0]+self.screen_size[0]-19-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),1)
     pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),9)
+    #debug, show the grounded variable
     if self.grounded and pyxel.btn(pyxel.KEY_B):
       pyxel.text(self.cam[0],self.cam[1],'grounded',8)
+    #death screen
     if self.dead:
-        
       self.player_pos[4]=max(0,self.player_pos[4]-0.1)
-      pyxel.text(50+self.cam[0], 50+self.cam[1], 'U dead', 8)
+      pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,16,48,16,0)
+      pyxel.text(self.cam[0]+self.screen_size[0]/2-55,self.cam[1]+40,"Press Space to restart",8)
 
         
 
  
   def obstacles_draw(self):
-    """draws each obstacle at its position and defines its hitbox
+    """draws each obstacle at its position and
     """    
     for obs in self.obstacle_list:
+      #managing the shiver animation when we hit an obstacle
       obs.shiver_time=max(obs.shiver_time-1,0)
       if obs.shiver_time==0:
         obs.is_shivering=False
       if obs.is_shivering:
         obs.shiver()
+      #draws each obstacle with two different layers (to allow more variation)
       pyxel.blt(obs.pos[0], obs.pos[1], 0, obs.texture_info[0], obs.texture_info[1], obs.texture_info[2], obs.texture_info[3], 0)
       pyxel.blt(obs.pos[0], obs.pos[1], 0, obs.texture_overlay[0], obs.texture_overlay[1], obs.texture_overlay[2], obs.texture_overlay[3], 0)
+      #debug, hitboxes of the obstacles
       if pyxel.btn(pyxel.KEY_B):  
         pyxel.rectb(obs.hitbox[0],obs.hitbox[1],obs.hitbox[2]-obs.hitbox[0],obs.hitbox[3]-obs.hitbox[1],8)
 
 
   def coins_draw(self):
-      """draws the two types of coins and gives them a value 
-      of 1 and 5 when picked up and defines its hitbox
+      """draws the coins, color depends on their value
+        also used for the pickup animation and therefore deletion from coins_list
       """    
+      
       to_be_deleted=[]
       for c in range(len(self.coin_list)):
         coin=self.coin_list[c]
@@ -281,6 +317,7 @@ class GameEngine:
         if coin.momentum<=-5:
           to_be_deleted.append(c)
         coin.pos[1]-=coin.momentum
+        #draw 
         if coin.value==1:
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
         if coin.value==5:
@@ -356,20 +393,20 @@ class GameEngine:
           else:
             pyxel.pset(int((x+pointA[0])/10),int(y/10)+6,7)  
 
-  def neige_draw(self):
+  def snow_draw(self):
     """does everything related to snowflakes.
     """    
     self.snow_flake_list.append([pyxel.rndi(30,286)+self.cam[0],pyxel.rndi(-30,98)+self.cam[1],pyxel.rndi(100,150),pyxel.rndi(1,3)])
     to_be_deleted=[]
     for i in range(len(self.snow_flake_list)): #each snowflake in the list
-        self.neige_mouvement(i)
+        self.snow_movement(i)
         if self.snow_flake_list[i][2]<=0 :
           to_be_deleted.append(i)
         pyxel.circb(self.snow_flake_list[i][0],self.snow_flake_list[i][1],[0,0,0,1][self.snow_flake_list[i][3]],self.snow_col[self.snow_flake_list[i][3]])
     for n in to_be_deleted:
       self.snow_flake_list.pop(n)
 
-  def neige_mouvement(self,i):
+  def snow_movement(self,i):
     """updates the position and lifespan of the snowflake at the position i of the self.snow_flake_list
 
     Args:
