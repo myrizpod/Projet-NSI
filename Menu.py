@@ -15,17 +15,24 @@ class MenuEngine:
         pyxel.mouse(True)
         #change the START button's color if the user hoover it with the mouse
         if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4:
-            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-10,1,11)
+            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-9,1,11)
         else:
             text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-10,1,3)
 
+        if self.screensize[0]-110 <= pyxel.mouse_x <= self.screensize[0]-90 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4:
+            text_border("Shop",75,self.screensize[1]-29,1,11)
+        else:
+            text_border("Shop",75,self.screensize[1]-30,1,3)
 
-
+        if self.screensize[0]-111 <= pyxel.mouse_x <= self.screensize[0]-90 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4:
+            text_border("Inventory",self.screensize[0]-110,self.screensize[1]-29,1,11)
+        else:
+            text_border("Inventory",self.screensize[0]-110,self.screensize[1]-30,1,3)
 
 
 
     def menu_update(self):
-        if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+        if pyxel.btnp(pyxel.KEY_SPACE) or (self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)):
             return True
         else:
             return False

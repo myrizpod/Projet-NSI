@@ -89,10 +89,6 @@ class GameEngine:
     if self.terrain[-1][0]-self.screen_size[0]*10<=(self.player_pos[0]+50)*10:
       self.gen_terrain(1)
 
-    #used properly quit the game (gonna use it for save files)
-    if pyxel.btnp(pyxel.KEY_Q):
-        print("Quitting")
-        pyxel.quit()
 
     
     #Obstacle generation
