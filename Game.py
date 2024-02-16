@@ -33,7 +33,7 @@ class GameEngine:
     self.coin_list=[] #list of the coins present in the game. Should be coin class.
     self.grounded=False #defines wether or not the player is grounded
     self.cam=[-100,-50] # position of the camera
-    self.scarfhate=0 #scarf end Y relative to player Y
+    self.scarf_height=0 #scarf end Y relative to player Y
     self.dead=False #if player is dead (for death screen)
     self.first_iteration=False #used for first iteration
     self.player_pos=[0,0,0,0,2] #player position info with [X,Y,indext of next closest point on terrain,downward momentum,forward momentum]
@@ -49,12 +49,13 @@ class GameEngine:
     self.coin_distance_min=100 #minimum distance between two coin patches
     self.is_paused=False
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
+    self.coin_mult=1
+    self.mult_timer=0
     
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
-    self.gen_terrain(self.screen_size[0]*10)
+    self.gen_terrain(self.screen_size[0]*15)
     print("Added points")
-    
   def game_update(self):
     """
     the function that runs most of the game, but doesnt do graphics
@@ -98,6 +99,7 @@ class GameEngine:
     self.obstacle_distance+=self.player_pos[4]
     if self.obstacle_distance>self.obstacle_distance_min and random.random()<0.02*self.player_pos[4]:
       self.obstacle_distance=0
+      self.coin_distance=50
       #calculate obstacle position
       pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])]
       y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0])*10),pointA,pointB)/10)
@@ -117,14 +119,18 @@ class GameEngine:
     self.coin_distance+=self.player_pos[4]
     if self.coin_distance>self.coin_distance_min and random.random()<0.02*self.player_pos[4]:
       self.coin_distance=0
+      self.obstacle_distance=50
       #spawns multiple coins at once to make a patch
       for i in range(0,random.randint(3,10)*8,8):
         #calculate obstacle position
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns 2 types of coins who have different values when picked up  
-        if random.random()<0.05: 
-          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
+        if random.random()<0.5:
+          if random.random()<0.2: 
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
+          else: 
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
         else:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1))
           
@@ -178,13 +184,19 @@ class GameEngine:
     Detects collisions between the player's hitbox and the coins' hitbox and collects it
     if the player's hitbox touches it.
     """
+    self.mult_timer=max(0,self.mult_timer-1)
+    if self.mult_timer==0:
+      self.mult=0
     if not self.dead:
       for c in range(len(self.coin_list)):
         coi=self.coin_list[c]
         if not coi.picked_up:
           for i in range(0,9):
             if coi.pos[0]<self.player_pos[0]+i<coi.pos[0]+4 and coi.pos[1]<self.player_pos[1]+i<coi.pos[1]+4:
-              self.pieces+=coi.value
+              if coi.effect=="double":
+                self.mult_timer=100
+                self.mult=2
+              self.pieces+=coi.value*self.coin_mult
               coi.pickup()
               break      
 
@@ -323,12 +335,13 @@ class GameEngine:
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
         if coin.value==5:
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 12, 4, 4, 0)
+        if coin.effect=="double":
+          pyxel.blt(coin.pos[0], coin.pos[1], 0, 40+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
 
         if pyxel.btn(pyxel.KEY_B):  
           pyxel.rectb(coin.pos[0], coin.pos[1],4,4,2)
       for n in to_be_deleted:
-        self.coin_list.pop(n)  
-
+        self.coin_list.pop(n)
 
   def draw_player(self):
     """draws player at its position and defines its hitbox
@@ -350,9 +363,9 @@ class GameEngine:
           col1 (int [0,15]): scarf color
       """
       scarf_dis=[[2,2],[0,3],[2,5],[7,3],[5,5],[7,4],[5,2],[4,0]] #scarf displacement depending on player rotation
-      self.scarfhate=min(self.scarfhate+pyxel.rndi(0,1),self.player_pos[4])
-      self.scarfhate=max(self.scarfhate-pyxel.rndi(0,1),-self.player_pos[4])
-      spos=[self.player_pos[0]-3*self.player_pos[4],self.player_pos[1]+self.scarfhate]
+      self.scarf_height=min(self.scarf_height+pyxel.rndi(0,1),self.player_pos[4])
+      self.scarf_height=max(self.scarf_height-pyxel.rndi(0,1),-self.player_pos[4])
+      spos=[self.player_pos[0]-3*self.player_pos[4],self.player_pos[1]+self.scarf_height]
       pyxel.line(self.player_pos[0]+scarf_dis[int(self.pdir)][0],self.player_pos[1]+scarf_dis[int(self.pdir)][1],spos[0]+scarf_dis[int(self.pdir)][0],spos[1]+scarf_dis[int(self.pdir)][1],col1)
  
   def gen_terrain(self,length):
@@ -416,11 +429,10 @@ class GameEngine:
     if self.is_paused:
       self.snow_flake_list[i][1]+=self.snow_flake_list[i][3]/10 #movement Y
       self.snow_flake_list[i][0]-=self.snow_flake_list[i][3]/10 #movement X
-      self.snow_flake_list[i][2]-=0.2 #lower lifespan
     else:  
       self.snow_flake_list[i][1]+=self.snow_flake_list[i][3]/2 #movement Y
       self.snow_flake_list[i][0]-=self.snow_flake_list[i][3]/2 #movement X
-      self.snow_flake_list[i][2]-=1 #lower lifespan
+    self.snow_flake_list[i][2]-=1 #lower lifespan
 
 class obstacle:  
   def __init__(self,x,y,type,variant=random.randint(0,3)):
@@ -473,7 +485,8 @@ class obstacle:
     self.pos=self.original_pos  
 
 class coin:
-  def __init__(self,x,y,value):
+  def __init__(self,x,y,value,effect="coin"):
+    self.effect=effect
     self.pos=[x,y]
     self.value=value
     self.momentum=0
