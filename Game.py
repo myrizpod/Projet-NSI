@@ -11,7 +11,7 @@ print("Launched Ü")
 print("Press Q to quit (and save info)")
 print("Press P to pause the game")
 print("Press U to respawn(debug only)")
-print("Press R to restart")
+print("Press space to restart")
 
 import pyxel
 import time
@@ -51,6 +51,8 @@ class GameEngine:
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
     self.coin_mult=1
     self.coin_mult_timer=0
+    self.double_jump=False
+    self.skis="double_jump"
     
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
@@ -148,11 +150,21 @@ class GameEngine:
         self.dead=False
     
     #jump
-    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead:
-      if self.grounded:
-        self.player_pos[3]=-2
+    if pyxel.btnp(pyxel.KEY_SPACE) and not self.dead:
+      if not self.grounded:
+        if self.double_jump:
+          self.player_pos[3]=-1.5
+          self.double_jump=False
+
       else:
-        self.pdir=(self.pdir+0.15)%8  
+        if self.skis=="double_jump":
+          self.double_jump=True
+        self.player_pos[3]=-2
+    
+    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded:
+      self.pdir=(self.pdir+0.15)%8 
+
+       
     self.detect_collisions_obstacles()
     self.detect_collision_coins()  
 
@@ -166,6 +178,8 @@ class GameEngine:
     pyxel.pal(7,15)
     pyxel.pal(6,14)
     pyxel.pal(12,13)
+
+    
 
 
   def detect_collisions_obstacles(self):
@@ -508,3 +522,11 @@ class coin:
     self.momentum=5
     self.picked_up=True
 
+"""
+class cosmetics:
+  def double_ski(self):
+    if pyxel.btn(pyxel.KEY_) and not self.dead:
+      if self.grounded:
+        self.player_pos[3]=-2
+
+"""
