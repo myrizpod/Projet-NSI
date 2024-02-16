@@ -10,7 +10,6 @@ Notes about the project ( bugs and other...):
 print("Launched Ü")
 print("Press Q to quit (and save info)")
 print("Press P to pause the game")
-print("Press U to respawn(debug only)")
 print("Press space to restart")
 
 import pyxel
@@ -46,7 +45,7 @@ class GameEngine:
     self.pieces=0 #number of coins of the player
     self.snow_col=[None,12,6,7] #colors for different snowflake layers
     self.coin_distance=0 #current distance between screen border and last coin patch
-    self.coin_distance_min=100 #minimum distance between two coin patches
+    self.coin_distance_min=300 #minimum distance between two coin patches
     self.is_paused=False
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
     self.coin_mult=1
@@ -101,7 +100,7 @@ class GameEngine:
     self.obstacle_distance+=self.player_pos[4]
     if self.obstacle_distance>self.obstacle_distance_min and random.random()<0.02*self.player_pos[4]:
       self.obstacle_distance=0
-      self.coin_distance=50
+      self.coin_distance=100
       #calculate obstacle position
       pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])]
       y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0])*10),pointA,pointB)/10)
@@ -180,8 +179,6 @@ class GameEngine:
     pyxel.pal(12,13)
 
     
-
-
   def detect_collisions_obstacles(self):
     """
     Detects collisions between the player's hitbox and the obstacles' hitbox and kills the player
@@ -302,8 +299,8 @@ class GameEngine:
     pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
     #coin mult coutner
     if self.coin_mult>1:
-      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30)),1)
-      pyxel.text(self.cam[0],self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30)),10)
+      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",1)
+      pyxel.text(self.cam[0],self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",10)
     #pause menu
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
@@ -522,11 +519,3 @@ class coin:
     self.momentum=5
     self.picked_up=True
 
-"""
-class cosmetics:
-  def double_ski(self):
-    if pyxel.btn(pyxel.KEY_) and not self.dead:
-      if self.grounded:
-        self.player_pos[3]=-2
-
-"""
