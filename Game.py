@@ -50,7 +50,7 @@ class GameEngine:
     self.is_paused=False
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
     self.coin_mult=1
-    self.mult_timer=0
+    self.coin_mult_timer=0
     
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
@@ -126,7 +126,7 @@ class GameEngine:
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns 2 types of coins who have different values when picked up  
-        if random.random()<0.5:
+        if random.random()<0.05:
           if random.random()<0.2: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
           else: 
@@ -134,17 +134,20 @@ class GameEngine:
         else:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1))
           
-    
+    #go to def for info
     self.player_movement()
 
     self.update_player_points()
+    #updates camera position based on player pos
     self.cam=[self.player_pos[0]-self.cam_offset[0],self.player_pos[1]-self.cam_offset[1]]
 
+    #respawn/restart
     if pyxel.btnp(pyxel.KEY_SPACE) and self.dead:
         self.__init__()
         pyxel.pal()
         self.dead=False
     
+    #jump
     if pyxel.btn(pyxel.KEY_SPACE) and not self.dead:
       if self.grounded:
         self.player_pos[3]=-2
@@ -153,8 +156,11 @@ class GameEngine:
     self.detect_collisions_obstacles()
     self.detect_collision_coins()  
 
+  
   def die(self):
-    alpha=3
+    """
+    mostly changing screen color
+    """
     self.dead=True
     pyxel.pal(5,2)
     pyxel.pal(7,15)
@@ -184,9 +190,9 @@ class GameEngine:
     Detects collisions between the player's hitbox and the coins' hitbox and collects it
     if the player's hitbox touches it.
     """
-    self.mult_timer=max(0,self.mult_timer-1)
-    if self.mult_timer==0:
-      self.mult=0
+    self.coin_mult_timer=max(0,self.coin_mult_timer-1)
+    if self.coin_mult_timer==0:
+      self.coin_mult=1
     if not self.dead:
       for c in range(len(self.coin_list)):
         coi=self.coin_list[c]
@@ -194,8 +200,8 @@ class GameEngine:
           for i in range(0,9):
             if coi.pos[0]<self.player_pos[0]+i<coi.pos[0]+4 and coi.pos[1]<self.player_pos[1]+i<coi.pos[1]+4:
               if coi.effect=="double":
-                self.mult_timer=100
-                self.mult=2
+                self.coin_mult_timer=150
+                self.coin_mult=2
               self.pieces+=coi.value*self.coin_mult
               coi.pickup()
               break      
@@ -280,6 +286,10 @@ class GameEngine:
     #coin counter
     pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
     pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
+    #coin mult coutner
+    if self.coin_mult>1:
+      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30)),1)
+      pyxel.text(self.cam[0],self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30)),10)
     #pause menu
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
