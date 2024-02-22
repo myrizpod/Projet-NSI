@@ -7,27 +7,33 @@ class MenuEngine:
 
     def menu_draw(self):
         pyxel.camera(0,0)
+
+        pyxel.text(240,110,str(pyxel.mouse_x),7)
+        pyxel.text(240,120,str(pyxel.mouse_y),7)
+
         #draws the menu borders
         for a in range(0,3,2):
-            pyxel.rectb(70+a,20+a,self.screensize[0]-140,self.screensize[1]-40,1)
+            pyxel.rectb(70+a,27+a,self.screensize[0]-140,self.screensize[1]-47,1)
 
         #Draws the mouse
         pyxel.mouse(True)
+
         #change the START button's color if the user hoover it with the mouse
-        if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4:
-            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-9,1,11)
+        #start button
+        if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3:
+            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-2,1,11)
         else:
-            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-10,1,3)
-
-        if self.screensize[0]-110 <= pyxel.mouse_x <= self.screensize[0]-90 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4:
-            text_border("Shop",75,self.screensize[1]-29,1,11)
+            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-2,1,3)
+        #shop button
+        if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
+            text_border("Shop",77,self.screensize[1]-29,1,11)
         else:
-            text_border("Shop",75,self.screensize[1]-30,1,3)
-
-        if self.screensize[0]-111 <= pyxel.mouse_x <= self.screensize[0]-90 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4:
-            text_border("Inventory",self.screensize[0]-110,self.screensize[1]-29,1,11)
+            text_border("Shop",77,self.screensize[1]-30,1,3)
+        #settings button
+        if self.screensize[0]-107 <= pyxel.mouse_x <= self.screensize[0]-75 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
+            text_border("Settings",self.screensize[0]-106,self.screensize[1]-29,1,11)
         else:
-            text_border("Inventory",self.screensize[0]-110,self.screensize[1]-30,1,3)
+            text_border("Settings",self.screensize[0]-106,self.screensize[1]-30,1,3)
 
 
 
