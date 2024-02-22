@@ -26,6 +26,9 @@ class GameEngine:
   def __init__(self):
 
     #Variable setup
+    self.scarf=Custom(name="yellow_scarf")
+    self.ski=Custom(name="red_ski")
+    self.player=Custom(name="donald")
     self.screen_size=[256,128] #constant, size of the screen [Height,Width]
     self.terrain=list([[-1500,0]]) #list of points that define the terrain, each point as [X,Y]
     self.obstacle_list=[] #list of the obstacles present in the game. Should be obstacle class.
@@ -61,7 +64,10 @@ class GameEngine:
     """
     the function that runs most of the game, but doesnt do graphics
     """
-    
+    # Disco mode
+    if pyxel.btn(pyxel.KEY_B):
+      self.scarf=Custom(name=random.choice(["yellow_scarf","red_scarf","green_scarf"]))
+
     #check if player is trying to pause/unpause
     if pyxel.btnp(pyxel.KEY_P):
       if self.is_paused:
@@ -287,7 +293,7 @@ class GameEngine:
     self.draw_terrain()
     self.obstacles_draw()
     self.coins_draw()
-    self.draw_scarf(8)
+    self.draw_scarf(self.scarf.texture[2])
     self.draw_player()
     self.snow_draw()
     #coin counter
@@ -364,9 +370,14 @@ class GameEngine:
     """draws player at its position and defines its hitbox
     """    
     rotframes=[[0, 32],[0, 40],[ 0, 48],[ 0, 56],[8, 32],[8, 40],[8, 48],[8, 56]] # sprites for player rotation range([0,7])
-    pyxel.blt(self.player_pos[0], self.player_pos[1], 0, rotframes[int(self.pdir)][0]+16, rotframes[int(self.pdir)][1], 8, 8, 0)
-    pyxel.blt(self.player_pos[0], self.player_pos[1], 0, rotframes[int(self.pdir)][0], rotframes[int(self.pdir)][1], 8, 8, 0)
-    pyxel.blt(self.player_pos[0], self.player_pos[1], 0, rotframes[int(self.pdir)][0]+32, rotframes[int(self.pdir)][1], 8, 8, 0)
+    disframes=[[0,-1],[-1,-1],[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1]]
+    xdis,ydis=disframes[int(self.pdir)]
+    #Skis
+    pyxel.blt(self.player_pos[0], self.player_pos[1], 0,self.ski.texture[0]+rotframes[int(self.pdir)][0]+16,self.ski.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
+    #Player
+    pyxel.blt(self.player_pos[0]+xdis, self.player_pos[1]+ydis, 0,self.player.texture[0]+rotframes[int(self.pdir)][0],self.player.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
+    #Scarf
+    pyxel.blt(self.player_pos[0], self.player_pos[1], 0,self.scarf.texture[0]+rotframes[int(self.pdir)][0]+32,self.scarf.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
     if pyxel.btn(pyxel.KEY_B):  
         pyxel.rectb(self.player_pos[0],self.player_pos[1],8,8,11)
  
@@ -514,4 +525,40 @@ class coin:
     """
     self.momentum=5
     self.picked_up=True
+
+class Custom:
+  """
+  The class for all custom modifiers like player, skis and scarf
+  """
+  def __init__(self,name="duck",ondeath=None,constant=None):
+    self.name=name
+    self.ondeath=ondeath
+    self.const=constant
+
+    if self.name=="duck":
+      self.texture=[0,0]
+    if self.name=="golden_duck":
+      self.texture=[0,32]
+    if self.name=="ninja_turtle":
+      self.texture=[0,64]
+    if self.name=="donald":
+      self.texture=[0,96]
+    
+    if self.name=="green_ski":
+      self.texture=[0,0]
+    if self.name=="yellow_ski":
+      self.texture=[0,64]
+    if self.name=="red_ski":
+      self.texture=[0,32]
+    if self.name=="black_ski":
+      self.texture=[0,96]
+
+    if self.name=="green_scarf":
+      self.texture=[0,32,11]
+    if self.name=="yellow_scarf":
+      self.texture=[0,64,10]
+    if self.name=="red_scarf":
+      self.texture=[0,0,8]
+    if self.name=="god_scarf":
+      self.texture=[0,96,1]
 
