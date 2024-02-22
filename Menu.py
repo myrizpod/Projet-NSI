@@ -8,8 +8,9 @@ class MenuEngine:
     def menu_draw(self):
         pyxel.camera(0,0)
 
-        pyxel.text(240,110,str(pyxel.mouse_x),7)
-        pyxel.text(240,120,str(pyxel.mouse_y),7)
+        if pyxel.btn(pyxel.KEY_B):
+            pyxel.text(240,self.screensize[1]-15,str(pyxel.mouse_x),1)
+            pyxel.text(240,self.screensize[1]-7,str(pyxel.mouse_y),1)
 
         #draws the menu borders
         for a in range(0,3,2):
