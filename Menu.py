@@ -21,7 +21,7 @@ class MenuEngine:
         #change the START button's color if the user hoover it with the mouse
         #start button
         if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3:
-            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-2,1,11)
+            text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-1,1,11)
         else:
             text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-2,1,3)
         #shop button
