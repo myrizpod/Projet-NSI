@@ -39,11 +39,11 @@ class MenuEngine:
 
 
     def menu_update(self):
-        if pyxel.btnp(pyxel.KEY_SPACE) or (self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-11 <= pyxel.mouse_y <= self.screensize[1]/2-4 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)):
+        if pyxel.btnp(pyxel.KEY_SPACE) or (self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)):
             return True
         else:
             return False
-    
+
 def text_border(text,x,y,borderColor,color):
     """draws text at position [x,y] of color color surrounded by a border of color borderColor. <-- Understandeable sentence
 
