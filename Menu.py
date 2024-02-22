@@ -7,7 +7,10 @@ class MenuEngine:
 
     def menu_draw(self):
         pyxel.camera(0,0)
+        #Draws the mouse
+        pyxel.mouse(True)
 
+        #reveal the mouse coordinates if the key "b" is pressed
         if pyxel.btn(pyxel.KEY_B):
             pyxel.text(240,self.screensize[1]-15,str(pyxel.mouse_x),1)
             pyxel.text(240,self.screensize[1]-7,str(pyxel.mouse_y),1)
@@ -15,11 +18,11 @@ class MenuEngine:
         #draws the menu borders
         for a in range(0,3,2):
             pyxel.rectb(70+a,27+a,self.screensize[0]-140,self.screensize[1]-47,1)
-
-        #Draws the mouse
-        pyxel.mouse(True)
-
-        #change the START button's color if the user hoover it with the mouse
+        
+        #Title
+        text_border("Ski Adventure",self.screensize[0]/2-26,10,1,11)
+        
+        #Menu buttons
         #start button
         if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3:
             text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-1,1,11)
