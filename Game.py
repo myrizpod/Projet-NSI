@@ -26,6 +26,7 @@ class GameEngine:
   def __init__(self):
 
     #Variable setup
+    self.show_player=True
     self.scarf=Custom(name="yellow_scarf")
     self.ski=Custom(name="red_ski")
     self.player=Custom(name="donald")
@@ -53,6 +54,7 @@ class GameEngine:
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
     self.coin_mult=1
     self.coin_mult_timer=0
+    self.invincible_timer=0
     self.double_jump=False
     self.skis="double_jump"
     
@@ -129,8 +131,10 @@ class GameEngine:
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns 2 types of coins who have different values when picked up  
-        if random.random()<0.05:
-          if random.random()<0.2: 
+        if random.random()<0.5:
+          if random.random()<1:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible"))
+          elif random.random()<0.2:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
           else: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
@@ -180,7 +184,9 @@ class GameEngine:
     pyxel.pal(6,14)
     pyxel.pal(12,13)
 
-    
+    def getstats(self):
+      return self.pieces,self.score
+
   def detect_collisions_obstacles(self):
     """
     Detects collisions between the player's hitbox and the obstacles' hitbox and kills the player
@@ -190,7 +196,7 @@ class GameEngine:
       for o in range(len(self.obstacle_list)):
         obs=self.obstacle_list[o]
         for i in range(0,9):
-          if obs.hitbox[0]<self.player_pos[0]+i<obs.hitbox[2] and obs.hitbox[1]<self.player_pos[1]+i<obs.hitbox[3]:
+          if obs.hitbox[0]<self.player_pos[0]+i<obs.hitbox[2] and obs.hitbox[1]<self.player_pos[1]+i<obs.hitbox[3] and self.invincible_timer < 0:
             self.obstacle_list[o].__init__(obs.pos[0],obs.pos[1],obs.type)  
             self.obstacle_list[o].shiver_time=10
             pyxel.play(0, 0)
@@ -206,6 +212,7 @@ class GameEngine:
     self.coin_mult_timer=max(0,self.coin_mult_timer-1)
     if self.coin_mult_timer==0:
       self.coin_mult=1
+    self.invincible_timer=max(0,self.invincible_timer-1)
     if not self.dead:
       for c in range(len(self.coin_list)):
         coi=self.coin_list[c]
@@ -216,6 +223,13 @@ class GameEngine:
                 self.coin_mult_timer=150
                 self.coin_mult=2
               self.pieces+=coi.value*self.coin_mult
+              coi.pickup()
+              if coi.effect=="invincible":
+                self.invincible_timer=150
+                
+
+
+
               coi.pickup()
               break      
 
@@ -293,8 +307,10 @@ class GameEngine:
     self.draw_terrain()
     self.obstacles_draw()
     self.coins_draw()
-    self.draw_scarf(self.scarf.texture[2])
-    self.draw_player()
+    if self.show_player:
+
+      self.draw_scarf(self.scarf.texture[2])
+      self.draw_player()
     self.snow_draw()
     #coin counter
     pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
@@ -303,6 +319,9 @@ class GameEngine:
     if self.coin_mult>1:
       pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",1)
       pyxel.text(self.cam[0],self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",10)
+    if self.invincible_timer>1:
+      pyxel.text(self.cam[0]+1,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",1)
+      pyxel.text(self.cam[0],self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",10)
     #pause menu
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
@@ -360,6 +379,8 @@ class GameEngine:
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 12, 4, 4, 0)
         if coin.effect=="double":
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 40+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
+        if coin.effect=="invincible":
+          pyxel.blt(coin.pos[0], coin.pos[1], 0, 40+int(time.monotonic()*3)%4*4, 12, 4, 4, 0)
 
         if pyxel.btn(pyxel.KEY_B):  
           pyxel.rectb(coin.pos[0], coin.pos[1],4,4,2)
