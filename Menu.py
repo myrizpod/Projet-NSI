@@ -4,16 +4,16 @@ from time import sleep
 class MenuEngine:
     #Everything related to the menu
     def __init__(self):
-        self.screensize=[256,128]
-        self.in_shop=False
-        self.in_popup=False
-        self.in_settings=False
-        self.coo_case_shop=[]
-        self.shop_selected_cases_skins=[]
-        self.shop_selected_cases_skis=[]
-        self.shop_selected_cases_=[]
-        self.shop_selected_cases_objects=[]
-        self.cases_shop=[["skin_1",0,1],["skin_2",100,0],["skin_3",100,0],["skin_4",100,0],["skin_5",100,0],["skin_6",100,0],["skin_7",100,0],["ski_1",0,1],["ski_2",100,0],["ski_3",100,0],["ski_4",100,0],["ski_5",100,0],["ski_6",100,0],["ski_7",100,0],["scarf_1",0,1],["scarf_2",100,0],["scarf_3",100,0],["scarf_4",100,0],["scarf_5",0],["scarf_6",100,0],["scarf_7",100,0],["object_1",0,0],["object_2",100,0],["object_3",100,0],["object_4",100,0],["object_5",100,0],["object_6",100,0],["object_7",100,0]]
+        self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
+        self.in_shop=False#Boolean true if the player is in the shop interface and false otherwise
+        self.in_popup=False#Boolean true if the player is in the shop interface and wanrts to buy a new item and false otherwise
+        self.in_settings=False#Boolean true if the player is in the settings interface and false otherwise
+        self.coo_case_shop=[]#List of all the coordinates of the item's case in the shop interface (now not full but after contains lists of coordinates (x and y))
+        self.shop_selected_cases_skins=[[81, 33]]#List of list of the coordinates (x and y) of the selected case in the skins line
+        self.shop_selected_cases_skis=[[81, 48]]#List of list of the coordinates (x and y) of the selected case in the skis line
+        self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
+        self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
+        self.cases_shop=[["skin_1",0,True],["skin_2",100,False],["skin_3",100,False],["skin_4",100,False],["skin_5",100,False],["skin_6",100,False],["skin_7",100,False],["ski_1",0,True],["ski_2",100,False],["ski_3",100,False],["ski_4",100,False],["ski_5",100,False],["ski_6",100,False],["ski_7",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
  
 
     def menu_draw(self):
@@ -63,6 +63,7 @@ class MenuEngine:
         
     #Shop interface
     def shop_interface(self):
+        """Draws the shop interface with its logic"""
         if self.in_popup==False:
             #clicked shop button
             text_border("Shop",77,self.screensize[1]-29,1,11)
@@ -80,25 +81,20 @@ class MenuEngine:
                 for x in range(81,166,14):
                     if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
                     pyxel.rectb(x,y,12,13,1)
-
             #detection of the mouse for shop selection + add the coordinates of the selected case to the list in relation
             for i in self.coo_case_shop:
                 if i[0] <= pyxel.mouse_x <= i[0]+12 and i[1] <= pyxel.mouse_y <= i[1]+13:
                     pyxel.rectb(i[0]-1,i[1]-1,14,15,11)
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                        if self.cases_shop[self.coo_case_shop.index(i)][2]==1:
+                        if self.cases_shop[self.coo_case_shop.index(i)][2]==True:
                             if i[1]==33 and i not in self.shop_selected_cases_skins:
                                 self.shop_selected_cases_skins.append(i)
-                                #print("shop_selected_cases_skins v0=",self.shop_selected_cases_skins)
                             elif i[1]==48 and i not in self.shop_selected_cases_skis:
                                 self.shop_selected_cases_skis.append(i)
-                                #print("shop_selected_cases_skis v0=",self.shop_selected_cases_skis)
-                            elif i[1]==65 and i not in self.shop_selected_cases_:
-                                self.shop_selected_cases_.append(i)
-                                #print("shop_selected_cases_ v0=",self.shop_selected_cases_)
+                            elif i[1]==65 and i not in self.shop_selected_cases_scarfs:
+                                self.shop_selected_cases_scarfs.append(i)
                             elif i[1]==82 and i not in self.shop_selected_cases_objects:
                                 self.shop_selected_cases_objects.append(i)
-                                #print("shop_selected_cases_objects v0=",self.shop_selected_cases_objects)
                         else: self.in_popup=i
                             
                     
@@ -116,10 +112,10 @@ class MenuEngine:
                 pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,6)
             
             #third line, scarfs
-            if len(self.shop_selected_cases_)>0:
-                if len(self.shop_selected_cases_)>1:
-                    del (self.shop_selected_cases_[0:-1])
-                pyxel.rectb(self.shop_selected_cases_[0][0],self.shop_selected_cases_[0][1],12,13,6)
+            if len(self.shop_selected_cases_scarfs)>0:
+                if len(self.shop_selected_cases_scarfs)>1:
+                    del (self.shop_selected_cases_scarfs[0:-1])
+                pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,6)
             
             #fourth line, objects
             if len(self.shop_selected_cases_objects)>0:
@@ -129,6 +125,12 @@ class MenuEngine:
         else: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))
 
     def shop_interface_popup_price_item(self,ncase):
+        """Draws a popup notifying the player of the price of the item he wants to purchase.
+        If the player is ok and has the money needed, it will substract the price to his coins.
+        Else it will simply close the popup
+
+        Arg :
+            ncase (int): the number of the item's case (0 to 27)"""
         pyxel.line(109,48,147,48,1)#line up
         pyxel.line(109,48,109,77,1)#line left
         pyxel.line(147,48,147,77,1)#line right
@@ -153,15 +155,16 @@ class MenuEngine:
         if 130 <= pyxel.mouse_x <= 144 and 73 <= pyxel.mouse_y <= 81:
             pyxel.rectb(130,73,15,9,0)
             pyxel.text(130+2,73+2,"Yes",0)
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):#and check if the number of coins is superior or equal to the item price
-                #need to substract the price of the item to the number of coins of the player
-                self.cases_shop[ncase][2]=1
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):###and check if the number of coins is superior or equal to the item price
+                ###need to substract the price of the item to the number of coins of the player
+                self.cases_shop[ncase][2]=True
                 self.in_popup=False
 
 
 
 
     def settings_interface(self):
+        """Draws the grphics of the settings interface with its logic"""
         #clicked settings button
         text_border("Settings",self.screensize[0]-106,self.screensize[1]-29,1,11)
 
