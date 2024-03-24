@@ -105,43 +105,61 @@ class MenuEngine:
             #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected
             #first line, skins
             if len(self.shop_selected_cases_skins)>0:
-                #print("condition 1 ok, longueur +0")
                 if len(self.shop_selected_cases_skins)>1:
-                    #print("condition 2 ok, longueur +1")
                     del (self.shop_selected_cases_skins[0:-1])
-                #print("dessination rect")
                 pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,6)
             
             #second line, skis
             if len(self.shop_selected_cases_skis)>0:
-                #print("condition 1 ok, longueur +0")
                 if len(self.shop_selected_cases_skis)>1:
-                    #print("condition 2 ok, longueur +1")
                     del (self.shop_selected_cases_skis[0:-1])
-                #print("dessination rect")
                 pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,6)
             
-            #third line, ?
+            #third line, scarfs
             if len(self.shop_selected_cases_)>0:
-                #print("condition 1 ok, longueur +0")
                 if len(self.shop_selected_cases_)>1:
-                    #print("condition 2 ok, longueur +1")
                     del (self.shop_selected_cases_[0:-1])
-                #print("dessination rect")
                 pyxel.rectb(self.shop_selected_cases_[0][0],self.shop_selected_cases_[0][1],12,13,6)
             
             #fourth line, objects
             if len(self.shop_selected_cases_objects)>0:
-                #print("condition 1 ok, longueur +0")
                 if len(self.shop_selected_cases_objects)>1:
-                    #print("condition 2 ok, longueur +1")
                     del (self.shop_selected_cases_objects[0:-1])
-                #print("dessination rect")
                 pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,6)
         else: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))
 
     def shop_interface_popup_price_item(self,ncase):
-        pyxel.rectb(109,48,39,30,1)
+        pyxel.line(109,48,147,48,1)#line up
+        pyxel.line(109,48,109,77,1)#line left
+        pyxel.line(147,48,147,77,1)#line right
+        pyxel.line(110,77,111,77,1)#1st part line down
+        pyxel.line(127,77,129,77,1)#second part line down
+        pyxel.line(145,77,146,77,1)#third part line down
+
+        pyxel.text(109+2,48+2,self.cases_shop[ncase][0]+" :",1)
+        pyxel.text(109+2,50+8,str(self.cases_shop[ncase][1])+" coins",1)
+
+        pyxel.rectb(112,73,15,9,1)#disagree rectangle
+        pyxel.text(112+2,73+2,"No",1)
+        pyxel.rectb(130,73,15,9,1)#agree rectangle
+        pyxel.text(130+2,73+2,"Yes",1)
+
+        if 112 <= pyxel.mouse_x <= 126 and 73 <= pyxel.mouse_y <= 81:
+            pyxel.rectb(112,73,15,9,0)
+            pyxel.text(112+2,73+2,"No",0)
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.in_popup=False
+        
+        if 130 <= pyxel.mouse_x <= 144 and 73 <= pyxel.mouse_y <= 81:
+            pyxel.rectb(130,73,15,9,0)
+            pyxel.text(130+2,73+2,"Yes",0)
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):#and check if the number of coins is superior or equal to the item price
+                #need to substract the price of the item to the number of coins of the player
+                self.cases_shop[ncase][2]=1
+                self.in_popup=False
+
+
+
 
     def settings_interface(self):
         #clicked settings button
