@@ -84,7 +84,7 @@ class MenuEngine:
             #detection of the mouse for shop selection + add the coordinates of the selected case to the list in relation
             for i in self.coo_case_shop:
                 if i[0] <= pyxel.mouse_x <= i[0]+12 and i[1] <= pyxel.mouse_y <= i[1]+13:
-                    pyxel.rectb(i[0]-1,i[1]-1,14,15,11)
+                    pyxel.rectb(i[0]-1,i[1]-1,14,15,12)
                     if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                         if self.cases_shop[self.coo_case_shop.index(i)][2]==True:
                             if i[1]==33 and i not in self.shop_selected_cases_skins:
@@ -103,25 +103,25 @@ class MenuEngine:
             if len(self.shop_selected_cases_skins)>0:
                 if len(self.shop_selected_cases_skins)>1:
                     del (self.shop_selected_cases_skins[0:-1])
-                pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,6)
+                pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,11)
             
             #second line, skis
             if len(self.shop_selected_cases_skis)>0:
                 if len(self.shop_selected_cases_skis)>1:
                     del (self.shop_selected_cases_skis[0:-1])
-                pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,6)
+                pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,11)
             
             #third line, scarfs
             if len(self.shop_selected_cases_scarfs)>0:
                 if len(self.shop_selected_cases_scarfs)>1:
                     del (self.shop_selected_cases_scarfs[0:-1])
-                pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,6)
+                pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,11)
             
             #fourth line, objects
             if len(self.shop_selected_cases_objects)>0:
                 if len(self.shop_selected_cases_objects)>1:
                     del (self.shop_selected_cases_objects[0:-1])
-                pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,6)
+                pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,11)
         else: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))
 
     def shop_interface_popup_price_item(self,ncase):
