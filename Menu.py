@@ -13,7 +13,7 @@ class MenuEngine:
         self.shop_selected_cases_skis=[[81, 48]]#List of list of the coordinates (x and y) of the selected case in the skis line
         self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
-        self.cases_shop=[["skin_1",0,True],["skin_2",100,False],["skin_3",100,False],["skin_4",100,False],["skin_5",100,False],["skin_6",100,False],["skin_7",100,False],["ski_1",0,True],["ski_2",100,False],["ski_3",100,False],["ski_4",100,False],["ski_5",100,False],["ski_6",100,False],["ski_7",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
+        self.cases_shop=[["skin_1",0,True],["skin_2",100,False],["skin_3",100,False],["skin_4",100,False],["skin_5",100,False],["skin_6",100,False],["skin_7",100,False],["ski_1",0,True],["ski_2",100,False],["ski_3",100,False],["ski_4",100,False],["ski_5",100,False],["ski_6",100,False],["ski_7",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",100,False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
  
 
     def menu_draw(self):
@@ -64,24 +64,25 @@ class MenuEngine:
     #Shop interface
     def shop_interface(self):
         """Draws the shop interface with its logic"""
+        #clicked shop button
+        text_border("Shop",77,self.screensize[1]-29,1,11)
+
+        #detection of the mouse to leave the shop interface
+        if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            self.in_shop=False
+
+        #boxes of selection
+        for y in range(33,49,15):
+            for x in range(81,166,14):
+                if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
+                pyxel.rectb(x,y,12,13,1)
+                pyxel.blt(x+2,y+3,2,((x-81)/14)*16,((y-33)/15)*32,8,8,0)
+        for y in range(65,83,17):
+            for x in range(81,166,14):
+                if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
+                pyxel.rectb(x,y,12,13,1)
+        #detection of the mouse for shop selection + add the coordinates of the selected case to the list in relation
         if self.in_popup==False:
-            #clicked shop button
-            text_border("Shop",77,self.screensize[1]-29,1,11)
-
-            #detection of the mouse to leave the shop interface
-            if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                self.in_shop=False
-
-            #boxes of selection
-            for y in range(33,49,15):
-                for x in range(81,166,14):
-                    if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
-                    pyxel.rectb(x,y,12,13,1)
-            for y in range(65,83,17):
-                for x in range(81,166,14):
-                    if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
-                    pyxel.rectb(x,y,12,13,1)
-            #detection of the mouse for shop selection + add the coordinates of the selected case to the list in relation
             for i in self.coo_case_shop:
                 if i[0] <= pyxel.mouse_x <= i[0]+12 and i[1] <= pyxel.mouse_y <= i[1]+13:
                     pyxel.rectb(i[0]-1,i[1]-1,14,15,12)
@@ -96,33 +97,34 @@ class MenuEngine:
                             elif i[1]==82 and i not in self.shop_selected_cases_objects:
                                 self.shop_selected_cases_objects.append(i)
                         else: self.in_popup=i
-                            
-                    
-            #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected
-            #first line, skins
-            if len(self.shop_selected_cases_skins)>0:
-                if len(self.shop_selected_cases_skins)>1:
-                    del (self.shop_selected_cases_skins[0:-1])
-                pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,11)
-            
-            #second line, skis
-            if len(self.shop_selected_cases_skis)>0:
-                if len(self.shop_selected_cases_skis)>1:
-                    del (self.shop_selected_cases_skis[0:-1])
-                pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,11)
-            
-            #third line, scarfs
-            if len(self.shop_selected_cases_scarfs)>0:
-                if len(self.shop_selected_cases_scarfs)>1:
-                    del (self.shop_selected_cases_scarfs[0:-1])
-                pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,11)
-            
-            #fourth line, objects
-            if len(self.shop_selected_cases_objects)>0:
-                if len(self.shop_selected_cases_objects)>1:
-                    del (self.shop_selected_cases_objects[0:-1])
-                pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,11)
-        else: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))
+                        
+                
+        #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected
+        #first line, skins
+        if len(self.shop_selected_cases_skins)>0:
+            if len(self.shop_selected_cases_skins)>1:
+                del (self.shop_selected_cases_skins[0:-1])
+            pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,11)
+        
+        #second line, skis
+        if len(self.shop_selected_cases_skis)>0:
+            if len(self.shop_selected_cases_skis)>1:
+                del (self.shop_selected_cases_skis[0:-1])
+            pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,11)
+        
+        #third line, scarfs
+        if len(self.shop_selected_cases_scarfs)>0:
+            if len(self.shop_selected_cases_scarfs)>1:
+                del (self.shop_selected_cases_scarfs[0:-1])
+            pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,11)
+        
+        #fourth line, objects
+        if len(self.shop_selected_cases_objects)>0:
+            if len(self.shop_selected_cases_objects)>1:
+                del (self.shop_selected_cases_objects[0:-1])
+            pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,11)
+
+        if self.in_popup!=False: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))
 
     def shop_interface_popup_price_item(self,ncase):
         """Draws a popup notifying the player of the price of the item he wants to purchase.
@@ -131,24 +133,27 @@ class MenuEngine:
 
         Arg :
             ncase (int): the number of the item's case (0 to 27)"""
-        pyxel.line(109,48,147,48,1)#line up
+        pyxel.line(109,48,148,48,1)#line up
         pyxel.line(109,48,109,77,1)#line left
-        pyxel.line(147,48,147,77,1)#line right
+        pyxel.line(148,48,148,77,1)#line right
         pyxel.line(110,77,111,77,1)#1st part line down
         pyxel.line(127,77,129,77,1)#second part line down
         pyxel.line(145,77,146,77,1)#third part line down
+        pyxel.rect(110,49,38,28,5)#background main window
+        pyxel.rect(113,77,13,4,5)#background no button
+        pyxel.rect(131,77,13,4,5)#background yes button
 
         pyxel.text(109+2,48+2,self.cases_shop[ncase][0]+" :",1)
         pyxel.text(109+2,50+8,str(self.cases_shop[ncase][1])+" coins",1)
 
         pyxel.rectb(112,73,15,9,1)#disagree rectangle
         pyxel.text(112+2,73+2,"No",1)
-        pyxel.rectb(130,73,15,9,1)#agree rectangle
-        pyxel.text(130+2,73+2,"Yes",1)
+        pyxel.rectb(131,73,15,9,1)#agree rectangle
+        pyxel.text(131+2,73+2,"Yes",1)
 
         if 112 <= pyxel.mouse_x <= 126 and 73 <= pyxel.mouse_y <= 81:
-            pyxel.rectb(112,73,15,9,0)
-            pyxel.text(112+2,73+2,"No",0)
+            pyxel.rectb(111,73,15,9,0)
+            pyxel.text(111+2,73+2,"No",0)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.in_popup=False
         
