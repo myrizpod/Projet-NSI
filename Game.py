@@ -23,14 +23,14 @@ import random
 class GameEngine:
 
 
-  def __init__(self):
+  def __init__(self,screen_size,show_player=True,pieces=0):
 
     #Variable setup
-    self.show_player=True
+    self.show_player=show_player
     self.scarf=Custom(name="yellow_scarf")
     self.ski=Custom(name="red_ski")
     self.player=Custom(name="donald")
-    self.screen_size=[256,128] #constant, size of the screen [Height,Width]
+    self.screen_size=screen_size #constant, size of the screen [Height,Width]
     self.terrain=list([[-1500,0]]) #list of points that define the terrain, each point as [X,Y]
     self.obstacle_list=[] #list of the obstacles present in the game. Should be obstacle class.
     self.coin_list=[] #list of the coins present in the game. Should be coin class.
@@ -46,7 +46,7 @@ class GameEngine:
     self.obstacle_distance=0 #distance from the last obstacle
     self.obstacle_distance_min=200 #minimum distance between two obstacles
     self.score=0 #score of the player
-    self.pieces=0 #number of coins of the player
+    self.pieces=pieces #number of coins of the player
     self.snow_col=[None,12,6,7] #colors for different snowflake layers
     self.coin_distance=0 #current distance between screen border and last coin patch
     self.coin_distance_min=300 #minimum distance between two coin patches
@@ -78,7 +78,7 @@ class GameEngine:
         self.is_paused=True
     #quit if currently paused
     if self.is_paused:
-      return
+      return True
     #remove the mouse
     pyxel.mouse(False)
     #camera movement for the beiginning animation
@@ -134,7 +134,7 @@ class GameEngine:
         if random.random()<0.5:
           if random.random()<1:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible"))
-          elif random.random()<0.2:
+          elif random.random()<0.2: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
           else: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
@@ -150,7 +150,7 @@ class GameEngine:
 
     #respawn/restart
     if pyxel.btnp(pyxel.KEY_SPACE) and self.dead:
-        self.__init__()
+        self.__init__(self.screen_size)
         pyxel.pal()
         self.dead=False
     
@@ -173,6 +173,8 @@ class GameEngine:
     self.detect_collisions_obstacles()
     self.detect_collision_coins()  
 
+    if self.dead:
+      return True
   
   def die(self):
     """
@@ -184,9 +186,9 @@ class GameEngine:
     pyxel.pal(6,14)
     pyxel.pal(12,13)
 
-    def getstats(self):
-      return self.pieces,self.score
-
+  def getstats(self):
+    return self.pieces,self.score
+    
   def detect_collisions_obstacles(self):
     """
     Detects collisions between the player's hitbox and the obstacles' hitbox and kills the player
@@ -223,13 +225,8 @@ class GameEngine:
                 self.coin_mult_timer=150
                 self.coin_mult=2
               self.pieces+=coi.value*self.coin_mult
-              coi.pickup()
               if coi.effect=="invincible":
                 self.invincible_timer=150
-                
-
-
-
               coi.pickup()
               break      
 
@@ -282,7 +279,7 @@ class GameEngine:
       self.player_pos[3]=min(0,self.player_pos[3])
 
     #check if player should fall or not + tries to stick it to the ground
-    if int(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-10<self.player_pos[1] and self.player_pos[3]>=0:
+    if int(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-12<self.player_pos[1] and self.player_pos[3]>=0:
       #reset downard speed when grounded
       self.player_pos[3]=0
       if not self.grounded:
@@ -308,7 +305,6 @@ class GameEngine:
     self.obstacles_draw()
     self.coins_draw()
     if self.show_player:
-
       self.draw_scarf(self.scarf.texture[2])
       self.draw_player()
     self.snow_draw()
@@ -582,4 +578,18 @@ class Custom:
       self.texture=[0,0,8]
     if self.name=="god_scarf":
       self.texture=[0,96,1]
+
+class Trail:
+  def __init__(self):
+    self.trail_col=[1,2,8,9,10]
+     
+  def update(self):
+    global player
+    for i in range(len(player.pos_old)):
+      player.pos_old[i].pop(0)
+      player.pos_old[i].append([player.pos[0]+(r.random()-0.5)*3,player.pos[1]+(r.random()-0.5)*3])
+    if player.movement_ability_time>90:
+      for x in range(len(player.pos_old)):
+        for each_color in range(len(self.trail_col)):
+          p.line(player.pos_old[x][each_color][0], player.pos_old[x][each_color][1], player.pos_old[x][each_color+1][0],player.pos_old[x][each_color+1][1],self.trail_col[each_color])
 
