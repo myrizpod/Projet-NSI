@@ -1,8 +1,7 @@
 import csv
-def save():
-    global best_score,total_coins,unlocked_items
+def save(best_score,total_coins,unlocked_items): 
     header = ["best_score","coins","unlocked_items"]
-    data = [[best_score,total_coins,unlocked_items]]
+    data = [[int(best_score),total_coins,unlocked_items]]
     filename = 'Save.csv'
     with open(filename, 'w', newline="") as file:
         csvwriter = csv.writer(file)
@@ -14,3 +13,4 @@ def load():
         reader = csv.DictReader(file)
         for row in reader:
             print(row)
+            return row

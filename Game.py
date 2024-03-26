@@ -56,7 +56,8 @@ class GameEngine:
     self.coin_mult_timer=0
     self.invincible_timer=0
     self.double_jump=False
-    self.skis="double_jump"
+    self.dash=False
+    self.skis="dash"
     
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
@@ -86,7 +87,8 @@ class GameEngine:
     
     #update score, quicker = more score/iteration
     self.score+=self.player_pos[4]
-
+    if not self.dead:
+      self.player_pos[4]=max(self.player_pos[4],self.score/500)
     #remove unused terrain points (behind the player)-
     if self.terrain[1][0]+self.cam_offset[0]*10+100<self.player_pos[0]*10:
       self.terrain.pop(0)
@@ -160,10 +162,17 @@ class GameEngine:
         if self.double_jump:
           self.player_pos[3]=-1.5
           self.double_jump=False
+        if self.dash:
+          self.player_pos[0]+=35
+          self.dash=False
 
       else:
         if self.skis=="double_jump":
           self.double_jump=True
+        if self.skis=="dash":
+          self.dash=True
+        self.player_pos[3]=-2
+    
         self.player_pos[3]=-2
     
     if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded:
@@ -187,7 +196,7 @@ class GameEngine:
     pyxel.pal(12,13)
 
   def getstats(self):
-    return self.pieces,self.score
+    return self.score,self.pieces
     
   def detect_collisions_obstacles(self):
     """
@@ -198,7 +207,7 @@ class GameEngine:
       for o in range(len(self.obstacle_list)):
         obs=self.obstacle_list[o]
         for i in range(0,9):
-          if obs.hitbox[0]<self.player_pos[0]+i<obs.hitbox[2] and obs.hitbox[1]<self.player_pos[1]+i<obs.hitbox[3] and self.invincible_timer < 0:
+          if obs.hitbox[0]<self.player_pos[0]+i<obs.hitbox[2] and obs.hitbox[1]<self.player_pos[1]+i<obs.hitbox[3] and self.invincible_timer <= 0:
             self.obstacle_list[o].__init__(obs.pos[0],obs.pos[1],obs.type)  
             self.obstacle_list[o].shiver_time=10
             pyxel.play(0, 0)
@@ -269,7 +278,6 @@ class GameEngine:
       if not self.grounded:
         #check if the player can properly land
         if self.pdir<1.5 or self.pdir>7.5:
-          self.player_pos[4]+=1
           self.pdir=0
         #otherwise die
         elif not self.dead:
