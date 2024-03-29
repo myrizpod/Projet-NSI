@@ -23,10 +23,11 @@ import random
 class GameEngine:
 
 
-  def __init__(self,screen_size,show_player=True,pieces=0):
+  def __init__(self,screen_size,app,not_in_menu=True):
 
     #Variable setup
-    self.show_player=show_player
+    self.app=app
+    self.not_in_menu=not_in_menu
     self.scarf=Custom(name="yellow_scarf")
     self.ski=Custom(name="red_ski")
     self.player=Custom(name="donald")
@@ -46,7 +47,7 @@ class GameEngine:
     self.obstacle_distance=0 #distance from the last obstacle
     self.obstacle_distance_min=200 #minimum distance between two obstacles
     self.score=0 #score of the player
-    self.pieces=pieces #number of coins of the player
+    self.pieces=0 #number of coins of the player
     self.snow_col=[None,12,6,7] #colors for different snowflake layers
     self.coin_distance=0 #current distance between screen border and last coin patch
     self.coin_distance_min=300 #minimum distance between two coin patches
@@ -58,7 +59,6 @@ class GameEngine:
     self.double_jump=False
     self.dash=False
     self.skis="dash"
-    
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
     self.gen_terrain(self.screen_size[0]*15)
@@ -152,7 +152,7 @@ class GameEngine:
 
     #respawn/restart
     if pyxel.btnp(pyxel.KEY_SPACE) and self.dead:
-        self.__init__(self.screen_size)
+        self.__init__(self.screen_size,self.app)
         pyxel.pal()
         self.dead=False
     
@@ -189,15 +189,12 @@ class GameEngine:
     """
     mostly changing screen color
     """
+    self.app.total_coins+=self.pieces
     self.dead=True
     pyxel.pal(5,2)
     pyxel.pal(7,15)
     pyxel.pal(6,14)
-    pyxel.pal(12,13)
 
-  def getstats(self):
-    return self.score,self.pieces
-    
   def detect_collisions_obstacles(self):
     """
     Detects collisions between the player's hitbox and the obstacles' hitbox and kills the player
@@ -312,13 +309,18 @@ class GameEngine:
     self.draw_terrain()
     self.obstacles_draw()
     self.coins_draw()
-    if self.show_player:
+    if self.not_in_menu:
       self.draw_scarf(self.scarf.texture[2])
       self.draw_player()
+      #coin counter
+      pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
+      pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
+      #score counter
+      pyxel.text(self.cam[0]+self.screen_size[0]-19-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),1)
+      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),9)
+    
     self.snow_draw()
-    #coin counter
-    pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
-    pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
+    
     #coin mult coutner
     if self.coin_mult>1:
       pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",1)
@@ -330,9 +332,6 @@ class GameEngine:
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
       pyxel.text(self.cam[0]+self.screen_size[0]/2-40,self.cam[1]+40,"Press P to return",1)
-    #score counter
-    pyxel.text(self.cam[0]+self.screen_size[0]-19-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),1)
-    pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),9)
     #debug, show the grounded variable
     if self.grounded and pyxel.btn(pyxel.KEY_B):
       pyxel.text(self.cam[0],self.cam[1],'grounded',8)

@@ -18,7 +18,7 @@ class App:
         pyxel.init(self.screen_size[0], self.screen_size[1],"Ski Game",30)
         pyxel.load("textures.pyxres")
         #wierd place to initialise game and menu but needed otherwise pyxel gets mad
-        game=GameEngine(self.screen_size,show_player=False,pieces=self.total_coins) 
+        game=GameEngine(self.screen_size,not_in_menu=False,app=self) 
         menu=MenuEngine()
         pyxel.run(self.update, self.draw)
 
@@ -33,7 +33,7 @@ class App:
         global menu,game
         #switch between runing the menu and the game
         if self.p_inGame==False and self.inGame==True:
-            game.__init__(self.screen_size,show_player=True)
+            game.__init__(self.screen_size,self,not_in_menu=True)
         self.p_inGame=self.inGame
         
 
@@ -41,8 +41,6 @@ class App:
         #used properly quit the game (gonna use it for save files)
         if pyxel.btnp(pyxel.KEY_Q):
             print("Quitting")
-            self.total_coins+=game.getstats()[1] 
-            self.best_score=game.getstats()[0] if game.getstats()[0]>self.best_score else self.best_score
             Save.save(self.best_score,self.total_coins,self.unlocked_items)
             Save.load()
             pyxel.quit()
@@ -51,5 +49,6 @@ class App:
             game.game_update()
         else:
             self.inGame=menu.menu_update()
-        
+
+
 App()
