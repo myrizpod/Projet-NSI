@@ -11,15 +11,20 @@ class App:
         global game,menu
         self.p_inGame=False
         self.inGame=False
-        self.total_coins=int(Save.load()["coins"])
-        self.best_score=int(Save.load()["best_score"])
+        tmp=Save.load()
+        self.total_coins=int(tmp["coins"])
+        self.best_score=int(tmp["best_score"])
+        tmp=tmp["unlocked_items"][1:-1].split(",")
+        tmp2=[True if x=="True" else False for x in tmp]
+        print("tmp:",tmp2)
+        print(len(tmp2))
         self.unlocked_items=Save.load()["unlocked_items"]
         self.screen_size=[256,128]
         pyxel.init(self.screen_size[0], self.screen_size[1],"Ski Game",30)
         pyxel.load("textures.pyxres")
         #wierd place to initialise game and menu but needed otherwise pyxel gets mad
         game=GameEngine(self.screen_size,not_in_menu=False,app=self) 
-        menu=MenuEngine()
+        menu=MenuEngine(self)
         pyxel.run(self.update, self.draw)
 
     def draw(self):
