@@ -1,5 +1,4 @@
 import pyxel
-from time import sleep
 
 class MenuEngine:
     #Everything related to the menu
@@ -13,8 +12,7 @@ class MenuEngine:
         self.shop_selected_cases_skis=[[81, 48]]#List of list of the coordinates (x and y) of the selected case in the skis line
         self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
-        self.cases_shop=[["skin_1",0,True],["skin_2",100,False],["skin_3",100,False],["skin_4",100,False],["skin_5",100,False],["skin_6",100,False],["skin_7",100,False],["ski_1",0,True],["ski_2",100,False],["ski_3",100,False],["ski_4",100,False],["ski_5",100,False],["ski_6",100,False],["ski_7",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",100,False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
- 
+        self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",100,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["dark_blue_ski",0,True],["light_blue_ski",100,False],["yellow_ski",100,False],["yellow_dark_blue_ski",100,False],["red_ski",100,False],["green_and_white_ski",100,False],["green_ski",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",100,False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
 
     def menu_draw(self):
         #set camera to coordinates (0;0)
@@ -66,7 +64,6 @@ class MenuEngine:
         """Draws the shop interface with its logic"""
         #clicked shop button
         text_border("Shop",77,self.screensize[1]-29,1,11)
-
         #detection of the mouse to leave the shop interface
         if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             self.in_shop=False
@@ -133,6 +130,7 @@ class MenuEngine:
 
         Arg :
             ncase (int): the number of the item's case (0 to 27)"""
+        #popup graphics
         pyxel.line(109,48,148,48,1)#line up
         pyxel.line(109,48,109,77,1)#line left
         pyxel.line(148,48,148,77,1)#line right
@@ -152,14 +150,14 @@ class MenuEngine:
         pyxel.text(131+2,73+2,"Yes",1)
 
         if 112 <= pyxel.mouse_x <= 126 and 73 <= pyxel.mouse_y <= 81:
-            pyxel.rectb(111,73,15,9,0)
-            pyxel.text(111+2,73+2,"No",0)
+            pyxel.rectb(112,73,15,9,0)
+            pyxel.text(112+2,73+2,"No",0)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.in_popup=False
         
         if 130 <= pyxel.mouse_x <= 144 and 73 <= pyxel.mouse_y <= 81:
-            pyxel.rectb(130,73,15,9,0)
-            pyxel.text(130+2,73+2,"Yes",0)
+            pyxel.rectb(131,73,15,9,0)
+            pyxel.text(131+2,73+2,"Yes",0)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):###and check if the number of coins is superior or equal to the item price
                 ###need to substract the price of the item to the number of coins of the player
                 self.cases_shop[ncase][2]=True
