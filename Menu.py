@@ -15,9 +15,10 @@ class MenuEngine:
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
         self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["dark_blue_ski",0,True],["light_blue_ski",100,False],["yellow_ski",100,False],["yellow_dark_blue_ski",100,False],["red_ski",100,False],["green_and_white_ski",100,False],["green_ski",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",100,False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
         for i in range(len(app.unlocked_items)-1):
-            print(i)
-            print(app.unlocked_items[0][i])
-            self.cases_shop[i][2]=app.unlocked_items[0][i]
+            if not self.cases_shop[i][2]==True:
+                self.cases_shop[i][2]=app.unlocked_items[i]
+        print(self.cases_shop)
+
     def menu_draw(self):
         #set camera to coordinates (0;0)
         pyxel.camera(0,0)

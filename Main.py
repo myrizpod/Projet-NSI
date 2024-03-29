@@ -15,10 +15,9 @@ class App:
         self.total_coins=int(tmp["coins"])
         self.best_score=int(tmp["best_score"])
         tmp=tmp["unlocked_items"][1:-1].split(",")
-        tmp2=[True if x=="True" else False for x in tmp]
-        print("tmp:",tmp2)
-        print(len(tmp2))
-        self.unlocked_items=Save.load()["unlocked_items"]
+        print("tmp:",tmp)
+        self.unlocked_items=[False if x==" False" else  True for x in tmp]
+        print("unlocked_items:",self.unlocked_items)
         self.screen_size=[256,128]
         pyxel.init(self.screen_size[0], self.screen_size[1],"Ski Game",30)
         pyxel.load("textures.pyxres")
