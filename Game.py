@@ -26,12 +26,11 @@ class GameEngine:
   def __init__(self,screen_size,app,not_in_menu=True):
 
     #Variable setup
-    self.trail=Trail()
     self.app=app
     self.not_in_menu=not_in_menu
     self.scarf=Custom(name="yellow_scarf")
-    self.ski=Custom(name="black_ski")
-    self.player=Custom(name="duck")
+    self.ski=Custom(name="red_ski")
+    self.player=Custom(name="donald")
     self.screen_size=screen_size #constant, size of the screen [Height,Width]
     self.terrain=list([[-1500,0]]) #list of points that define the terrain, each point as [X,Y]
     self.obstacle_list=[] #list of the obstacles present in the game. Should be obstacle class.
@@ -41,7 +40,6 @@ class GameEngine:
     self.scarf_height=0 #scarf end Y relative to player Y
     self.dead=False #if player is dead (for death screen)
     self.first_iteration=False #used for first iteration
-    self.player_old_pos=[[0,0],[0,0],[0,0],[0,0]]
     self.player_pos=[0,0,0,0,2] #player position info with [X,Y,indext of next closest point on terrain,downward momentum,forward momentum]
     self.terrain_size_mult=70 #defines how zoomed in is the terrain
     self.snow_flake_list=[] # individual snow flakes
@@ -395,15 +393,15 @@ class GameEngine:
   def draw_player(self):
     """draws player at its position and defines its hitbox
     """    
-    rotframes=[[0, 0],[0, 8],[ 0, 16],[ 0, 24],[8, 0],[8, 8],[8, 16],[8, 24]] # sprites for player rotation range([0,7])
+    rotframes=[[0, 32],[0, 40],[ 0, 48],[ 0, 56],[8, 32],[8, 40],[8, 48],[8, 56]] # sprites for player rotation range([0,7])
     disframes=[[0,-1],[-1,-1],[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1]]
     xdis,ydis=disframes[int(self.pdir)]
     #Skis
-    pyxel.blt(self.player_pos[0], self.player_pos[1], 2,self.ski.texture[0]+rotframes[int(self.pdir)][0],self.ski.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
+    pyxel.blt(self.player_pos[0], self.player_pos[1], 0,self.ski.texture[0]+rotframes[int(self.pdir)][0]+16,self.ski.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
     #Player
-    pyxel.blt(self.player_pos[0]+xdis, self.player_pos[1]+ydis, 2,self.player.texture[0]+rotframes[int(self.pdir)][0],self.player.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
+    pyxel.blt(self.player_pos[0]+xdis, self.player_pos[1]+ydis, 0,self.player.texture[0]+rotframes[int(self.pdir)][0],self.player.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
     #Scarf
-    pyxel.blt(self.player_pos[0], self.player_pos[1], 2,self.scarf.texture[0]+rotframes[int(self.pdir)][0],self.scarf.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
+    pyxel.blt(self.player_pos[0], self.player_pos[1], 0,self.scarf.texture[0]+rotframes[int(self.pdir)][0]+32,self.scarf.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
     if pyxel.btn(pyxel.KEY_B):  
         pyxel.rectb(self.player_pos[0],self.player_pos[1],8,8,11)
  
@@ -564,20 +562,20 @@ class Custom:
     if self.name=="duck":
       self.texture=[0,0]
     if self.name=="golden_duck":
-      self.texture=[48,0]
+      self.texture=[0,32]
     if self.name=="ninja_turtle":
       self.texture=[0,64]
     if self.name=="donald":
-      self.texture=[16,0]
+      self.texture=[0,96]
     
-    if self.name=="black_ski":
-      self.texture=[0,32]
-    if self.name=="blue_ski":
-      self.texture=[16,32]
-    if self.name=="electric_ski":
-      self.texture=[32,32]
+    if self.name=="green_ski":
+      self.texture=[0,0]
     if self.name=="yellow_ski":
-      self.texture=[48,32]
+      self.texture=[0,64]
+    if self.name=="red_ski":
+      self.texture=[0,32]
+    if self.name=="black_ski":
+      self.texture=[0,96]
 
     if self.name=="green_scarf":
       self.texture=[0,32,11]
@@ -593,11 +591,12 @@ class Trail:
     self.trail_col=[1,2,8,9,10]
      
   def update(self):
-    for i in range(len(self.player_pos_old)):
-      self.player_pos_old[i].pop(0)
-      self.player_pos_old[i].append([player.pos[0]+(r.random()-0.5)*3,player.pos[1]+(r.random()-0.5)*3])
+    global player
+    for i in range(len(player.pos_old)):
+      player.pos_old[i].pop(0)
+      player.pos_old[i].append([player.pos[0]+(r.random()-0.5)*3,player.pos[1]+(r.random()-0.5)*3])
     if player.movement_ability_time>90:
-      for x in range(len(self.player_pos_old)):
+      for x in range(len(player.pos_old)):
         for each_color in range(len(self.trail_col)):
-          p.line(self.player_pos_old[x][each_color][0], self.player_pos_old[x][each_color][1], self.player_pos_old[x][each_color+1][0],self.player_pos_old[x][each_color+1][1],self.trail_col[each_color])
+          p.line(player.pos_old[x][each_color][0], player.pos_old[x][each_color][1], player.pos_old[x][each_color+1][0],player.pos_old[x][each_color+1][1],self.trail_col[each_color])
 

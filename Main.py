@@ -14,10 +14,8 @@ class App:
         tmp=Save.load()
         self.total_coins=int(tmp["coins"])
         self.best_score=int(tmp["best_score"])
-        tmp=tmp["unlocked_items"][1:-1].split(",")
-        print("tmp:",tmp)
-        self.unlocked_items=[False if x==" False" else  True for x in tmp]
-        print("unlocked_items:",self.unlocked_items)
+        tmp=tmp["unlocked_items"][1:-1].split(",")#Selection of the list (trunc to get the usefull part) with the unlocked items and split it
+        self.unlocked_items=[False if x==" False" else True for x in tmp]#Conversion of the str elements in tmp to boolean to get used after in the menu file
         self.screen_size=[256,128]
         pyxel.init(self.screen_size[0], self.screen_size[1],"Ski Game",30)
         pyxel.load("textures.pyxres")

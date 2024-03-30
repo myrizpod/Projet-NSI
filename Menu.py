@@ -13,11 +13,15 @@ class MenuEngine:
         self.shop_selected_cases_skis=[[81, 48]]#List of list of the coordinates (x and y) of the selected case in the skis line
         self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
+        self.selected_skin=""#Name of the selected skin (str)
+        self.selected_ski=""#Name of the selected ski (str)
+        self.selected_scarf=""#Name of the selected scarf (str)
+        self.selected_object=""#Name of the selected object (str)
         self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["dark_blue_ski",0,True],["light_blue_ski",100,False],["yellow_ski",100,False],["yellow_dark_blue_ski",100,False],["red_ski",100,False],["green_and_white_ski",100,False],["green_ski",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",100,False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
+        #Reading the already acquired items and changing the value of the boolean of self.cases_shop according to it
         for i in range(len(app.unlocked_items)-1):
             if not self.cases_shop[i][2]==True:
                 self.cases_shop[i][2]=app.unlocked_items[i]
-        print(self.cases_shop)
 
     def menu_draw(self):
         #set camera to coordinates (0;0)
@@ -69,12 +73,12 @@ class MenuEngine:
         """Draws the shop interface with its logic"""
         #clicked shop button
         text_border("Shop",77,self.screensize[1]-29,1,11)
-        print(self.app.total_coins)
+
         #detection of the mouse to leave the shop interface
         if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             self.in_shop=False
 
-        #boxes of selection
+        #graphics of the boxes of selection
         for y in range(33,49,15):
             for x in range(81,166,14):
                 if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
@@ -84,6 +88,8 @@ class MenuEngine:
             for x in range(81,166,14):
                 if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
                 pyxel.rectb(x,y,12,13,1)
+                pyxel.blt(x+2,y+3,2,((x-81)/14)*16,64+((y-65)/17)*32,8,8,0)
+        
         #detection of the mouse for shop selection + add the coordinates of the selected case to the list in relation
         if self.in_popup==False:
             for i in self.coo_case_shop:
@@ -99,39 +105,43 @@ class MenuEngine:
                                 self.shop_selected_cases_scarfs.append(i)
                             elif i[1]==82 and i not in self.shop_selected_cases_objects:
                                 self.shop_selected_cases_objects.append(i)
-                        else: self.in_popup=i
+                        else: self.in_popup=i#Saving the value of the case to buy
                         
                 
-        #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected
+        #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected + add the name of the selected item per line in the related variable to be used in the game file
         #first line, skins
         if len(self.shop_selected_cases_skins)>0:
             if len(self.shop_selected_cases_skins)>1:
                 del (self.shop_selected_cases_skins[0:-1])
             pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,11)
+            self.selected_skin=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_skins[0])][0]
         
         #second line, skis
         if len(self.shop_selected_cases_skis)>0:
             if len(self.shop_selected_cases_skis)>1:
                 del (self.shop_selected_cases_skis[0:-1])
             pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,11)
+            self.selected_ski=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_skis[0])][0]
         
         #third line, scarfs
         if len(self.shop_selected_cases_scarfs)>0:
             if len(self.shop_selected_cases_scarfs)>1:
                 del (self.shop_selected_cases_scarfs[0:-1])
             pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,11)
+            self.selected_scarf=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_scarfs[0])][0]
         
         #fourth line, objects
         if len(self.shop_selected_cases_objects)>0:
             if len(self.shop_selected_cases_objects)>1:
                 del (self.shop_selected_cases_objects[0:-1])
             pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,11)
+            self.selected_object=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_objects[0])][0]
 
-        if self.in_popup!=False: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))
+        if self.in_popup!=False: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))#Drawing a popup for the wanting purchase 
 
     def shop_interface_popup_price_item(self,ncase):
         """Draws a popup notifying the player of the price of the item he wants to purchase.
-        If the player is ok and has the money needed, it will substract the price to his coins.
+        If the player is ok and has the money needed, it will substract the price to his coins and unlock the choiced item.
         Else it will simply close the popup
 
         Arg :
@@ -147,33 +157,28 @@ class MenuEngine:
         pyxel.rect(113,77,13,4,5)#background no button
         pyxel.rect(131,77,14,4,5)#background yes button
 
-        pyxel.text(109+2,48+2,self.cases_shop[ncase][0]+" :",1)
-        pyxel.text(109+2,50+8,str(self.cases_shop[ncase][1])+" coins",1)
+        pyxel.text(109+2,48+2,self.cases_shop[ncase][0]+" :",1)#Draw the name of the item to buy in the popup
+        pyxel.text(109+2,50+8,str(self.cases_shop[ncase][1])+" coins",1)#Draw the price of the item to buy in the popup
 
         pyxel.rectb(112,73,15,9,1)#disagree rectangle
         pyxel.text(112+2,73+2,"No",1)
         pyxel.rectb(131,73,15,9,1)#agree rectangle
         pyxel.text(131+2,73+2,"Yes",1)
 
+        #Detection of the mouse coordinates to leave the popup interface
         if 112 <= pyxel.mouse_x <= 126 and 73 <= pyxel.mouse_y <= 81:
             pyxel.rectb(112,73,15,9,0)
             pyxel.text(112+2,73+2,"No",0)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.in_popup=False
-        
+        #Detection of the mouse coordinates to purchase (if the player has the correct amount of money) the item to buy
         if 130 <= pyxel.mouse_x <= 144 and 73 <= pyxel.mouse_y <= 81:
             pyxel.rectb(131,73,15,9,0)
             pyxel.text(131+2,73+2,"Yes",0)
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.app.total_coins>=self.cases_shop[ncase][1]:###and check if the number of coins is superior or equal to the item price
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.app.total_coins>=self.cases_shop[ncase][1]:
                 self.app.total_coins-=self.cases_shop[ncase][1]
-                self.cases_shop[ncase][2]=True
+                self.cases_shop[ncase][2],self.app.unlocked_items[ncase]=True, True
                 self.in_popup=False
-                self.app.unlocked_items=[]
-                for i in self.cases_shop:
-                    self.app.unlocked_items.append(i[2])
-
-
-
 
     def settings_interface(self):
         """Draws the grphics of the settings interface with its logic"""
