@@ -1,7 +1,7 @@
 # Projet-NSI
 !!IMPORTANT!!                                                            
 IL FAUT DESORMAIS LE FICHIER Main.py,Menu.py ET Game.py DANS LE MEME REPERTOIR ET LANCER LE MAIN.
-ainst que le fichier texture.pyxres
+ainsi que le fichier texture.pyxres, menu.py, save.py et save.csv
 
 
 
@@ -11,7 +11,7 @@ Description globale du jeu: Le jeu s'appelle "Ski Adventure"; le principe est de
 
 Interface et bibliothèque graphique: Le jeu est crée avec Pyxel Studio et en utilisant Python pour coder. <br>
 
-Utlisateurs et utilisation du clavier/souris: Le joueur (l'utilisateur) utilise uniquement le clavier pour jouer en faisant sauter et tourner le skieur. L'utilisateur peut éventuellement utiliser la souris pour faire des choix dans le menu. <br>
+Utlisateurs et utilisation du clavier/souris: Le joueur (l'utilisateur) utilise uniquement le clavier pour jouer en faisant sauter et tourner le skieur (uniquement touche espace et Q/Echap pour quitter). L'utilisateur peut utiliser la souris pour faire des choix dans le menu. <br>
 
 Audio/bruitage: Pas encore implementé mais on envisage de créer une musique de fond et des bruitages lors des collisions avec les obstacles. <br>
 
@@ -27,8 +27,8 @@ Ce qui reste a faire (22/03/24):<br>
 
 Pour l'évolutivité: On envisage de mettre un boss final au bout d'un certain score que le joueur devra affronter pour gagner. Pour l'intant, le jeu est interminable, la map est généré à l'infini. <br>
 
-Pour les choix possibles: On veut mettre un mode desert et un mode hiver, ou lers couleurs changent. <br>
+Pour les choix possibles: On veut mettre un mode desert en plus du mode hiver initial (les couleurs changent). <br>
 
-Pour les paramètres réglables: Dans le menu, on veut faire en sorte que l'utilisateur puisse choisir des différents skis et personnages qui pourront impacter certaines variables comme la vitesse pour augmenter son score. <br>
+Pour les paramètres réglables: Dans le menu, on veut faire en sorte que l'utilisateur puisse choisir des différents skis et personnages qui pourront impacter certaines variables comme la vitesse pour augmenter son score. La partie paramètre reste encore à dévelloper.<br>
 
 
