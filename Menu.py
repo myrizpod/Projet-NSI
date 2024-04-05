@@ -17,7 +17,7 @@ class MenuEngine:
         self.selected_ski=""#Name of the selected ski (str)
         self.selected_scarf=""#Name of the selected scarf (str)
         self.selected_object=""#Name of the selected object (str)
-        self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["dark_blue_ski",0,True],["light_blue_ski",100,False],["yellow_ski",100,False],["yellow_dark_blue_ski",100,False],["red_ski",100,False],["green_and_white_ski",100,False],["green_ski",100,False],["scarf_1",0,True],["scarf_2",100,False],["scarf_3",100,False],["scarf_4",100,False],["scarf_5",100,False],["scarf_6",100,False],["scarf_7",100,False],["object_1",0,False],["object_2",100,False],["object_3",100,False],["object_4",100,False],["object_5",100,False],["object_6",100,False],["object_7",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
+        self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["dark_blue_ski",0,True],["light_blue_ski",100,False],["yellow_dark_blue_ski",100,False],["yellow_ski",100,False],["red_ski",100,False],["green_and_white_ski",100,False],["green_ski",100,False],["dark_blue_scarf",0,True],["light_blue_scarf",100,False],["yellow_dak_blue_scarf",100,False],["yellow_scarf",100,False],["red_scarf",100,False],["green_and_white_scarf",100,False],["green_scarf",100,False],["shield",0,False],["chest",100,False],["bomb",100,False],["froggy",100,False],["heart",100,False],["key",100,False],["trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
         #Reading the already acquired items and changing the value of the boolean of self.cases_shop according to it
         for i in range(len(app.unlocked_items)-1):
             if not self.cases_shop[i][2]==True:
@@ -63,7 +63,6 @@ class MenuEngine:
             else:
                 text_border("Settings",self.screensize[0]-106,self.screensize[1]-30,1,3)
 
-
         #detection of selected interface
         elif self.in_shop==True: self.shop_interface()
         elif self.in_settings==True: self.settings_interface()
@@ -106,7 +105,6 @@ class MenuEngine:
                             elif i[1]==82 and i not in self.shop_selected_cases_objects:
                                 self.shop_selected_cases_objects.append(i)
                         else: self.in_popup=i#Saving the value of the case to buy
-                        
                 
         #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected + add the name of the selected item per line in the related variable to be used in the game file
         #first line, skins
@@ -177,7 +175,7 @@ class MenuEngine:
             pyxel.text(131+2,73+2,"Yes",0)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.app.total_coins>=self.cases_shop[ncase][1]:
                 self.app.total_coins-=self.cases_shop[ncase][1]
-                self.cases_shop[ncase][2],self.app.unlocked_items[ncase]=True, True
+                self.cases_shop[ncase][2],self.app.unlocked_items[ncase]=True,True
                 self.in_popup=False
 
     def settings_interface(self):
