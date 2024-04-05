@@ -58,8 +58,10 @@ class GameEngine:
     self.coin_mult=1
     self.coin_mult_timer=0
     self.invincible_timer=0
+    self.magnet_timer=0
     self.double_jump=False
     self.dash=False
+    self.jump_timer=0
     self.skis="dash"
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
@@ -136,7 +138,13 @@ class GameEngine:
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns 2 types of coins who have different values when picked up  
         if random.random()<0.5:
-          if random.random()<1:
+          if random.random()<0.5:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet"))
+          elif random.random()<0.2:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
+          elif random.random()<0.2:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
+          elif random.random()<0.1:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible"))
           elif random.random()<0.2: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
@@ -168,14 +176,17 @@ class GameEngine:
           self.player_pos[0]+=35
           self.dash=False
 
+
       else:
         if self.skis=="double_jump":
           self.double_jump=True
         if self.skis=="dash":
           self.dash=True
         self.player_pos[3]=-2
+        if self.jump_timer>0:
+          self.player_pos[3]=-3
     
-        self.player_pos[3]=-2
+
     
     if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded:
       self.pdir=(self.pdir+0.15)%8 
@@ -223,6 +234,8 @@ class GameEngine:
     if self.coin_mult_timer==0:
       self.coin_mult=1
     self.invincible_timer=max(0,self.invincible_timer-1)
+    self.jump_timer=max(0,self.jump_timer-1)
+    self.magnet_timer=max(0,self.invincible_timer-1)
     if not self.dead:
       for c in range(len(self.coin_list)):
         coi=self.coin_list[c]
@@ -236,6 +249,11 @@ class GameEngine:
               if coi.effect=="invincible":
                 self.invincible_timer=150
               coi.pickup()
+              if coi.effect=="jump_boost":
+                self.jump_timer=150
+              coi.pickup()
+              if coi.effect=="bomb":
+                self.die()
               break      
 
             
@@ -330,6 +348,12 @@ class GameEngine:
     if self.invincible_timer>1:
       pyxel.text(self.cam[0]+1,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",1)
       pyxel.text(self.cam[0],self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",10)
+    if self.jump_timer>1:
+      pyxel.text(self.cam[0]+1,self.cam[1]+16,"Jump boost - "+str(int(self.jump_timer/30))+"s",1)
+      pyxel.text(self.cam[0],self.cam[1]+16,"Jump boost - "+str(int(self.jump_timer/30))+"s",10)
+    if self.magnet_timer>1:
+      pyxel.text(self.cam[0]+1,self.cam[1]+16,"Magnet - "+str(int(self.magnet_timer/30))+"s",1)
+      pyxel.text(self.cam[0],self.cam[1]+16,"Magnet - "+str(int(self.magnet_timer/30))+"s",10)
     #pause menu
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
@@ -385,7 +409,13 @@ class GameEngine:
         if coin.effect=="double":
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 40+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
         if coin.effect=="invincible":
-          pyxel.blt(coin.pos[0], coin.pos[1], 0, 40+int(time.monotonic()*3)%4*4, 12, 4, 4, 0)
+          pyxel.blt(coin.pos[0]-2, coin.pos[1]-2, 2, 0, 96, 8, 8, 0)
+        if coin.effect=="jump_boost":
+          pyxel.blt(coin.pos[0]-2, coin.pos[1], 2, 48, 100, 6, 4, 0)
+        if coin.effect=="bomb":
+          pyxel.blt(coin.pos[0]-2, coin.pos[1]-2, 2, 32, 96, 8, 8, 0)
+        if coin.effect=="magnet":
+          pyxel.blt(coin.pos[0]-2, coin.pos[1]-2, 2, 64, 96, 8, 8, 0)
 
         if pyxel.btn(pyxel.KEY_B):  
           pyxel.rectb(coin.pos[0], coin.pos[1],4,4,2)
