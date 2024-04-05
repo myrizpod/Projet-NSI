@@ -5,6 +5,7 @@ class MenuEngine:
     def __init__(self,app):
         self.app=app
         self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
+        self.target_coins=self.app.total_coins
         self.in_shop=False#Boolean true if the player is in the shop interface and false otherwise
         self.in_popup=False#Boolean true if the player is in the shop interface and wanrts to buy a new item and false otherwise
         self.in_settings=False#Boolean true if the player is in the settings interface and false otherwise
@@ -13,11 +14,11 @@ class MenuEngine:
         self.shop_selected_cases_skis=[[81, 48]]#List of list of the coordinates (x and y) of the selected case in the skis line
         self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
-        self.selected_skin=""#Name of the selected skin (str)
-        self.selected_ski=""#Name of the selected ski (str)
-        self.selected_scarf=""#Name of the selected scarf (str)
+        self.selected_skin="The_Duck"#Name of the selected skin (str)
+        self.selected_ski="dark_blue_ski"#Name of the selected ski (str)
+        self.selected_scarf="Dark_blue_scarf"#Name of the selected scarf (str)
         self.selected_object=""#Name of the selected object (str)
-        self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["dark_blue_ski",0,True],["light_blue_ski",100,False],["yellow_dark_blue_ski",100,False],["yellow_ski",100,False],["red_ski",100,False],["green_and_white_ski",100,False],["green_ski",100,False],["dark_blue_scarf",0,True],["light_blue_scarf",100,False],["yellow_dak_blue_scarf",100,False],["yellow_scarf",100,False],["red_scarf",100,False],["green_and_white_scarf",100,False],["green_scarf",100,False],["shield",0,False],["chest",100,False],["bomb",100,False],["froggy",100,False],["heart",100,False],["key",100,False],["trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
+        self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["Dark_blue_ski",0,True],["Light_blue_ski",100,False],["Yellow_dark_blue_ski",100,False],["Yellow_ski",100,False],["Red_ski",100,False],["Green_and_white_ski",100,False],["Green_ski",100,False],["Dark_blue_scarf",0,True],["Light_blue_scarf",100,False],["Yellow_dak_blue_scarf",100,False],["Yellow_scarf",100,False],["Red_scarf",100,False],["Green_and_white_scarf",100,False],["Green_scarf",100,False],["shield",0,False],["chest",100,False],["bomb",100,False],["froggy",100,False],["heart",100,False],["key",100,False],["trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
         #Reading the already acquired items and changing the value of the boolean of self.cases_shop according to it
         for i in range(len(app.unlocked_items)-1):
             if not self.cases_shop[i][2]==True:
@@ -76,6 +77,11 @@ class MenuEngine:
         #detection of the mouse to leave the shop interface
         if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             self.in_shop=False
+
+        if self.app.total_coins>self.target_coins:
+            if self.app.total_coins-self.target_coins>=5: self.app.total_coins-=155
+            else: self.app.total_coins-=self.app.total_coins-self.target_coins
+        pyxel.text(3,3,str(self.app.total_coins),10)
 
         #graphics of the boxes of selection
         for y in range(33,49,15):
@@ -174,7 +180,7 @@ class MenuEngine:
             pyxel.rectb(131,73,15,9,0)
             pyxel.text(131+2,73+2,"Yes",0)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.app.total_coins>=self.cases_shop[ncase][1]:
-                self.app.total_coins-=self.cases_shop[ncase][1]
+                self.target_coins-=self.cases_shop[ncase][1]
                 self.cases_shop[ncase][2],self.app.unlocked_items[ncase]=True,True
                 self.in_popup=False
 
