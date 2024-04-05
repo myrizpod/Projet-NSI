@@ -145,18 +145,18 @@ class MenuEngine:
         Arg :
             ncase (int): the number of the item's case (0 to 27)"""
         #popup graphics
-        pyxel.line(109,48,148,48,1)#line up
-        pyxel.line(109,48,109,77,1)#line left
-        pyxel.line(148,48,148,77,1)#line right
-        pyxel.line(110,77,111,77,1)#1st part line down
+        pyxel.line(95,48,162,48,1)#line up
+        pyxel.line(95,48,95,77,1)#line left
+        pyxel.line(162,48,162,77,1)#line right
+        pyxel.line(95,77,111,77,1)#1st part line down
         pyxel.line(127,77,130,77,1)#second part line down
-        pyxel.line(146,77,147,77,1)#third part line down
-        pyxel.rect(110,49,38,28,5)#background main window
+        pyxel.line(146,77,162,77,1)#third part line down
+        pyxel.rect(96,49,66,28,5)#background main window
         pyxel.rect(113,77,13,4,5)#background no button
         pyxel.rect(131,77,14,4,5)#background yes button
 
-        pyxel.text(109+2,48+2,self.cases_shop[ncase][0]+" :",1)#Draw the name of the item to buy in the popup
-        pyxel.text(109+2,50+8,str(self.cases_shop[ncase][1])+" coins",1)#Draw the price of the item to buy in the popup
+        pyxel.text(96+1,48+5,self.cases_shop[ncase][0]+" :",1)#Draw the name of the item to buy in the popup
+        pyxel.text(96+1,53+8,str(self.cases_shop[ncase][1])+" coins",1)#Draw the price of the item to buy in the popup
 
         pyxel.rectb(112,73,15,9,1)#disagree rectangle
         pyxel.text(112+2,73+2,"No",1)
