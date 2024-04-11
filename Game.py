@@ -23,15 +23,15 @@ import random
 class GameEngine:
 
 
-  def __init__(self,screen_size,app,not_in_menu=True):
+  def __init__(self,screen_size,app,skin="The_Duck",scarf="Dark_blue_scarf",ski="Dark_blue_ski",not_in_menu=True):
 
     #Variable setup
     self.trail=Trail()
     self.app=app
     self.not_in_menu=not_in_menu
-    self.scarf=Custom(name="yellow_scarf")
-    self.ski=Custom(name="black_ski")
-    self.player=Custom(name="duck")
+    self.scarf=Custom(app,name=scarf)
+    self.ski=Custom(app,name=ski)
+    self.player=Custom(app,name=skin)
     self.screen_size=screen_size #constant, size of the screen [Height,Width]
     self.terrain=list([[-1500,0]]) #list of points that define the terrain, each point as [X,Y]
     self.obstacle_list=[] #list of the obstacles present in the game. Should be obstacle class.
@@ -73,7 +73,7 @@ class GameEngine:
     """
     # Disco mode
     if pyxel.btn(pyxel.KEY_B):
-      self.scarf=Custom(name=random.choice(["yellow_scarf","red_scarf","green_scarf"]))
+      self.scarf=Custom(self.app,name=random.choice(["yellow_scarf","red_scarf","green_scarf"]))
 
     #check if player is trying to pause/unpause
     if pyxel.btnp(pyxel.KEY_P):
@@ -586,37 +586,15 @@ class Custom:
   """
   The class for all custom modifiers like player, skis and scarf
   """
-  def __init__(self,name="duck",ondeath=None,constant=None):
+  def __init__(self,app,name=None,ondeath=None,constant=None):
     self.name=name
+    self.app=app
     self.ondeath=ondeath
     self.const=constant
+    for i in range(len(app.menu.cases_shop)):
+      if app.menu.cases_shop[i][0]==self.name:  
+        self.texture=[(i%8)*16,math.trunc(i)*32,1]
 
-    if self.name=="duck":
-      self.texture=[0,0]
-    if self.name=="golden_duck":
-      self.texture=[48,0]
-    if self.name=="ninja_turtle":
-      self.texture=[0,64]
-    if self.name=="donald":
-      self.texture=[16,0]
-    
-    if self.name=="black_ski":
-      self.texture=[0,32]
-    if self.name=="blue_ski":
-      self.texture=[16,32]
-    if self.name=="electric_ski":
-      self.texture=[32,32]
-    if self.name=="yellow_ski":
-      self.texture=[48,32]
-
-    if self.name=="green_scarf":
-      self.texture=[0,32,11]
-    if self.name=="yellow_scarf":
-      self.texture=[0,64,10]
-    if self.name=="red_scarf":
-      self.texture=[0,0,8]
-    if self.name=="god_scarf":
-      self.texture=[0,96,1]
 
 class Trail:
   def __init__(self):
