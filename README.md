@@ -1,5 +1,5 @@
 # Projet-NSI
-!!IMPORTANT!!                                                            
+!!IMPORTANT!!!
 IL FAUT DESORMAIS LE FICHIER Main.py,Menu.py ET Game.py DANS LE MEME REPERTOIR ET LANCER LE MAIN.
 ainsi que le fichier texture.pyxres, menu.py, save.py et save.csv
 
