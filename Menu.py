@@ -15,7 +15,7 @@ class MenuEngine:
         self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
         self.selected_skin="The_Duck"#Name of the selected skin (str)
-        self.selected_ski="dark_blue_ski"#Name of the selected ski (str)
+        self.selected_ski="Dark_blue_ski"#Name of the selected ski (str)
         self.selected_scarf="Dark_blue_scarf"#Name of the selected scarf (str)
         self.selected_object=""#Name of the selected object (str)
         self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["Dark_blue_ski",0,True],["Light_blue_ski",100,False],["Yellow_dark_blue_ski",100,False],["Yellow_ski",100,False],["Red_ski",100,False],["Green_and_white_ski",100,False],["Green_ski",100,False],["Dark_blue_scarf",0,True],["Light_blue_scarf",100,False],["Yellow_dak_blue_scarf",100,False],["Yellow_scarf",100,False],["Red_scarf",100,False],["Green_and_white_scarf",100,False],["Green_scarf",100,False],["Shield",0,False],["Chest",100,False],["Bomb",100,False],["Froggy",100,False],["Magnet",100,False],["Key",100,False],["Trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
