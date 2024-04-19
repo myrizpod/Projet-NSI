@@ -56,11 +56,11 @@ class GameEngine:
     self.coin_mult=1
     self.coin_mult_timer=0
     self.invincible_timer=0
-    self.magnet_timer=0
+    self.magnet_timer=990
     self.double_jump=False
     self.dash=False
     self.jump_timer=0
-    self.effects=["no_flip","dash","double_jump","double_coins"]
+    self.effects=[]
     self.dashed=False
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
@@ -135,25 +135,22 @@ class GameEngine:
         #calculate obstacle position
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
-        #Randomly spawns 2 types of coins who have different values when picked up
-        r=random.random()
-        if r<0.05:
-          r=random.random()
-          if r<=0.16:
+        #Randomly spawns 2 types of coins who have different values when picked up  
+        if random.random()<0.5:
+          if random.random()<0.5:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet"))
-          elif 0.16<r<=0.32:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
-          elif 0.32<r<=0.48:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible"))
-          elif 0.48<r<=0.64: 
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
-          elif r>=0.64:
+          elif random.random()<0.2:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
-          
-        elif r<0.15:
-          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #piece bleue
+          elif random.random()<0.2:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
+          elif random.random()<0.1:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible"))
+          elif random.random()<0.2: 
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
+          else: 
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
         else:
-          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #piece classique
+          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1))
           
     #go to def for info
     self.player_movement()
@@ -164,17 +161,19 @@ class GameEngine:
 
     #respawn/restart
     if pyxel.btnp(pyxel.KEY_SPACE) and self.dead:
-        self.__init__(self.screen_size,self.app)
+        self.__init__(self.screen_size,self.app,not_in_menu=False)
+        self.app.p_inGame=False
+        self.app.inGame=False
         pyxel.pal()
         self.dead=False
     
     #jump
-    if pyxel.btnp(pyxel.KEY_SPACE) and not self.dead and "double_jump" in self.effects:
+    if pyxel.btnp(pyxel.KEY_SPACE) and not self.dead:
       if not self.grounded:
         if self.double_jump:
           self.player_pos[3]=-1.5
           self.double_jump=False
-        if self.dash :
+        if self.dash:
           self.dashed=True
           self.cam_offset[0]+=int(35*self.player_pos[4])
           self.dash=False
@@ -191,7 +190,7 @@ class GameEngine:
     
 
     
-    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded and "no_flip" not in self.effects:
+    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded:
       self.pdir=(self.pdir+0.15)%8 
 
        
@@ -248,7 +247,7 @@ class GameEngine:
               if coi.effect=="double":
                 self.coin_mult_timer=150
                 self.coin_mult=2
-              self.pieces=self.pieces+coi.value*self.coin_mult*2 if "double_coins" in self.effects else self.pieces+coi.value*self.coin_mult
+              self.pieces+=coi.value*self.coin_mult
               if coi.effect=="invincible":
                 self.invincible_timer=150
               coi.pickup()
