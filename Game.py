@@ -26,7 +26,6 @@ class GameEngine:
   def __init__(self,screen_size,app,skin="The_Duck",scarf="Dark_blue_scarf",ski="Dark_blue_ski",not_in_menu=True):
 
     #Variable setup
-    self.trail=Trail()
     self.app=app
     self.not_in_menu=not_in_menu
     self.scarf=Custom(app,name=scarf)
@@ -41,7 +40,6 @@ class GameEngine:
     self.scarf_height=0 #scarf end Y relative to player Y
     self.dead=False #if player is dead (for death screen)
     self.first_iteration=False #used for first iteration
-    self.player_old_pos=[[0,0],[0,0],[0,0],[0,0]]
     self.player_pos=[0,0,0,0,2] #player position info with [X,Y,indext of next closest point on terrain,downward momentum,forward momentum]
     self.terrain_size_mult=70 #defines how zoomed in is the terrain
     self.snow_flake_list=[] # individual snow flakes
@@ -58,11 +56,12 @@ class GameEngine:
     self.coin_mult=1
     self.coin_mult_timer=0
     self.invincible_timer=0
-    self.magnet_timer=0
+    self.magnet_timer=990
     self.double_jump=False
     self.dash=False
     self.jump_timer=0
-    self.skis="dash"
+    self.effects=["dash","double_jump"]
+    self.dashed=False
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
     self.gen_terrain(self.screen_size[0]*15)
@@ -173,14 +172,15 @@ class GameEngine:
           self.player_pos[3]=-1.5
           self.double_jump=False
         if self.dash:
-          self.player_pos[0]+=35
+          self.dashed=True
+          self.cam_offset[0]+=int(35*self.player_pos[4])
           self.dash=False
 
 
       else:
-        if self.skis=="double_jump":
+        if "double_jump" in self.effects:
           self.double_jump=True
-        if self.skis=="dash":
+        if "dash" in self.effects:
           self.dash=True
         self.player_pos[3]=-2
         if self.jump_timer>0:
@@ -235,7 +235,7 @@ class GameEngine:
       self.coin_mult=1
     self.invincible_timer=max(0,self.invincible_timer-1)
     self.jump_timer=max(0,self.jump_timer-1)
-    self.magnet_timer=max(0,self.invincible_timer-1)
+    #self.magnet_timer=max(0,self.magnet_timer-1)
     if not self.dead:
       for c in range(len(self.coin_list)):
         coi=self.coin_list[c]
@@ -329,7 +329,14 @@ class GameEngine:
     self.draw_terrain()
     self.obstacles_draw()
     self.coins_draw()
+    if self.dash:
+      [1,2,8,9,10]
     if self.not_in_menu:
+      if self.dashed:
+        for i in range(int(35*self.player_pos[4])) :
+          self.player_pos[0]+=1
+          self.draw_player()
+        self.dashed=False  
       self.draw_scarf(self.scarf.texture[2])
       self.draw_player()
       #coin counter
@@ -397,10 +404,13 @@ class GameEngine:
       for c in range(len(self.coin_list)):
         coin=self.coin_list[c]
         if coin.picked_up:
-          coin.momentum-=1
-        if coin.momentum<=-5:
+          coin.momentum[1]-=1
+        if coin.momentum[1]<=-5:
           to_be_deleted.append(c)
-        coin.pos[1]-=coin.momentum
+        if self.magnet_timer>0:
+          coin.momentum[0]-=0.1
+        coin.pos[0]+=coin.momentum[0]
+        coin.pos[1]-=coin.momentum[1]
         #draw 
         if coin.value==1:
           pyxel.blt(coin.pos[0], coin.pos[1], 0, 24+int(time.monotonic()*3)%4*4, 8, 4, 4, 0)
@@ -573,13 +583,13 @@ class coin:
     self.effect=effect
     self.pos=[x,y]
     self.value=value
-    self.momentum=0
+    self.momentum=[0,0]
     self.picked_up=False
   def pickup(self):
     """
     Defines a momentum(height) for the coins and picking up the coins
     """
-    self.momentum=5
+    self.momentum[1]=5
     self.picked_up=True
 
 class Custom:
@@ -592,20 +602,7 @@ class Custom:
     self.ondeath=ondeath
     self.const=constant
     for i in range(len(app.menu.cases_shop)):
-      if app.menu.cases_shop[i][0]==self.name:  
-        self.texture=[(i%8)*16,math.trunc(i)*32,1]
-
-
-class Trail:
-  def __init__(self):
-    self.trail_col=[1,2,8,9,10]
-     
-  def update(self):
-    for i in range(len(self.player_pos_old)):
-      self.player_pos_old[i].pop(0)
-      self.player_pos_old[i].append([player.pos[0]+(r.random()-0.5)*3,player.pos[1]+(r.random()-0.5)*3])
-    if player.movement_ability_time>90:
-      for x in range(len(self.player_pos_old)):
-        for each_color in range(len(self.trail_col)):
-          p.line(self.player_pos_old[x][each_color][0], self.player_pos_old[x][each_color][1], self.player_pos_old[x][each_color+1][0],self.player_pos_old[x][each_color+1][1],self.trail_col[each_color])
+      if app.menu.cases_shop[i][0]==self.name: 
+        print()
+        self.texture=[(i%7)*16,int(i/7)*32,1]
 
