@@ -11,7 +11,7 @@ class MenuEngine:
     #Everything related to the menu
     def __init__(self,app):
         self.app=app
-        self.screensize=[256*self.app.tutu,128*self.app.tutu]#List of the size of the screen (arg 0: width, arg 1: height)
+        self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
         self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
         self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.target_coins=self.app.total_coins
