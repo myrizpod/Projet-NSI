@@ -1,10 +1,17 @@
 import pyxel
-
+"""
+To do:
+    - optimize the popup graphics /
+    - replace the coordinates with variables /
+    - make the popup show the effect of the wanted item (if there is one) /
+    - create the mode button of desert/snow with its logic
+    - replace the colors of the graphics with variables depending on the game's mode
+"""
 class MenuEngine:
     #Everything related to the menu
     def __init__(self,app):
         self.app=app
-        self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
+        self.screensize=[256*self.app.tutu,128*self.app.tutu]#List of the size of the screen (arg 0: width, arg 1: height)
         self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
         self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.target_coins=self.app.total_coins
@@ -55,7 +62,7 @@ class MenuEngine:
             else:
                 text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-2,1,3)
             #shop button
-            if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
+            if 76 <= pyxel.mouse_x <= 92 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
                 text_border("Shop",77,self.screensize[1]-29,1,11)
                 if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_settings==False: self.in_shop=True
             else:
@@ -83,14 +90,15 @@ class MenuEngine:
         text_border("Shop",77,self.screensize[1]-29,1,11)
 
         #detection of the mouse to leave the shop interface
-        if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_popup==False:
+        if 76 <= pyxel.mouse_x <= 92 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_popup==False:
             self.in_shop=False
 
+        #showing the actual amount of money with an animation decreasing it if the player bought something in the shop
         if self.app.total_coins>self.target_coins:
             if self.app.total_coins-self.target_coins>=5: self.app.total_coins-=5
             else: self.app.total_coins-=self.app.total_coins-self.target_coins
-        pyxel.text(4,3,str(self.app.total_coins),1)
-        pyxel.text(3,3,str(self.app.total_coins),10)
+        pyxel.text(4,3,str(self.app.total_coins),1)#shadow of the text of the amount of money
+        pyxel.text(3,3,str(self.app.total_coins),10)#text of the amount of money
 
         #graphics of the boxes of selection
         for y in range(33,49,15):
@@ -155,24 +163,21 @@ class MenuEngine:
 
     def shop_interface_popup_price_item(self,ncase):
         """Draws a popup notifying the player of the price of the item he wants to purchase.
-        If the player is ok and has the money needed, it will substract the price to his coins and unlock the choiced item.
+        If the player is ok and has the money needed, it will substract the price to his coins and unlock the selected item.
         Else it will simply close the popup
 
         Arg :
             ncase (int): the number of the item's case (0 to 27)"""
         #popup graphics
-        pyxel.line(95,48,162,48,1)#line up
-        pyxel.line(95,48,95,77,1)#line left
-        pyxel.line(162,48,162,77,1)#line right
-        pyxel.line(95,77,111,77,1)#1st part line down
-        pyxel.line(127,77,130,77,1)#second part line down
-        pyxel.line(146,77,162,77,1)#third part line down
+        pyxel.rectb(95,48,68,30,1)#principal popup's rect
         pyxel.rect(96,49,66,28,5)#background main window
         pyxel.rect(113,77,13,4,5)#background no button
         pyxel.rect(131,77,14,4,5)#background yes button
 
-        pyxel.text(96+1,48+5,self.cases_shop[ncase][0]+" :",1)#Draw the name of the item to buy in the popup
-        pyxel.text(96+1,53+8,str(self.cases_shop[ncase][1])+" coins",1)#Draw the price of the item to buy in the popup
+        pyxel.text(96+1,48+2,self.cases_shop[ncase][0]+" :",1)#show the name of the item to buy in the popup
+        pyxel.text(96+1,48+9,str(self.cases_shop[ncase][1])+" coins",1)#show the price of the item to buy in the popup
+        if len(self.cases_shop[ncase])==4:
+            pyxel.text(96,48+16,"("+self.cases_shop[ncase][3]+")",1)#revealing the item's special effect if it has one
 
         pyxel.rectb(112,73,15,9,1)#disagree rectangle
         pyxel.text(112+2,73+2,"No",1)
@@ -198,59 +203,59 @@ class MenuEngine:
     def settings_interface(self):
         """Draws the graphics of the settings interface with its logic"""
         #rect of settings
-        pyxel.rectb(134,71,50,25,1)
+        pyxel.rectb(self.screensize[0]-122,self.screensize[1]-57,50,25,1)
         
         #global global volume design
-        pyxel.rect(138,75,2,4,3)
-        pyxel.line(140,74,140,79,3)
-        pyxel.line(141,73,141,80,3)
+        pyxel.rect(self.screensize[0]-118,self.screensize[1]-53,2,4,3)
+        pyxel.line(self.screensize[0]-116,self.screensize[1]-54,self.screensize[0]-116,self.screensize[1]-49,3)
+        pyxel.line(self.screensize[0]-115,self.screensize[1]-55,self.screensize[0]-115,self.screensize[1]-48,3)
         #line of the global volume with colors changing with the actual global volume (self.global_volume)
-        for x in range(143,143+13,2):
-            pyxel.line(x,75,x,78,0)
-        for v in range(143,143+2*(self.global_volume),2):
-            pyxel.line(v,75,v,78,1)
+        for x in range(self.screensize[0]-113,self.screensize[0]-113+13,2):
+            pyxel.line(x,self.screensize[1]-53,x,self.screensize[1]-50,0)
+        for v in range(self.screensize[0]-113,self.screensize[0]-113+2*(self.global_volume),2):
+            pyxel.line(v,self.screensize[1]-53,v,self.screensize[1]-50,1)
         #design of the global volume button
         #"+" button
-        if 158 <= pyxel.mouse_x <= 163 and 74 <= pyxel.mouse_y <=79:
-            pyxel.rect(160,74,2,6,0)#vertical line of the "+"
-            pyxel.rect(158,76,6,2,0)#horyzontal line of the "+"
+        if self.screensize[0]-98 <= pyxel.mouse_x <= self.screensize[0]-93 and self.screensize[1]-54 <= pyxel.mouse_y <= self.screensize[1]-49:
+            pyxel.rect(self.screensize[0]-96,self.screensize[1]-54,2,6,0)#vertical line of the "+"
+            pyxel.rect(self.screensize[0]-98,self.screensize[1]-52,6,2,0)#horyzontal line of the "+"
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume<7: self.global_volume+=1
         else:
-            pyxel.rect(160,74,2,6,1)#vertical line of the "+"
-            pyxel.rect(158,76,6,2,1)#horyzontal line of the "+"
+            pyxel.rect(self.screensize[0]-96,self.screensize[1]-54,2,6,1)#vertical line of the "+"
+            pyxel.rect(self.screensize[0]-98,self.screensize[1]-52,6,2,1)#horyzontal line of the "+"
         #"-" button
-        if 168 <= pyxel.mouse_x <= 171 and 76 <= pyxel.mouse_y <= 77:
-            pyxel.rect(168,76,4,2,0)#line of the "-"
+        if self.screensize[0]-88 <= pyxel.mouse_x <= self.screensize[0]-85 and self.screensize[1]-52 <= pyxel.mouse_y <= self.screensize[1]-51:
+            pyxel.rect(self.screensize[0]-88,self.screensize[1]-52,4,2,0)#line of the "-"
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume>0: self.global_volume-=1
         else:
-            pyxel.rect(168,76,4,2,1)#line of the "-"
+            pyxel.rect(self.screensize[0]-88,self.screensize[1]-52,4,2,1)#line of the "-"
 
         #music volume design
-        pyxel.line(136,89,136,90,3)#first part lest of the 'ball' 
-        pyxel.rect(137,88,2,4,3)#major part of the 'ball'
-        pyxel.line(139,82,139,90,3)#principal line
-        pyxel.line(140,83,141,84,3)#first part of the head
-        pyxel.line(140,84,142,86,3)#second part of the head
+        pyxel.line(self.screensize[0]-120,self.screensize[1]-39,self.screensize[0]-120,self.screensize[1]-38,3)#first part lest of the 'ball' 
+        pyxel.rect(self.screensize[0]-119,self.screensize[1]-40,2,4,3)#major part of the 'ball'
+        pyxel.line(self.screensize[0]-117,self.screensize[1]-46,self.screensize[0]-117,self.screensize[1]-38,3)#principal line
+        pyxel.line(self.screensize[0]-116,self.screensize[1]-45,self.screensize[0]-115,self.screensize[1]-44,3)#first part of the head
+        pyxel.line(self.screensize[0]-116,self.screensize[1]-44,self.screensize[0]-114,self.screensize[1]-42,3)#second part of the head
         #line of the music volume with colors changing with the actual music volume (self.music_volume)
-        for x in range(144,144+13,2):
-            pyxel.line(x,86,x,89,0)
-        for v in range(144,144+(2*self.music_volume),2):
-            pyxel.line(v,86,v,89,1)
+        for x in range(self.screensize[0]-112,self.screensize[0]-112+13,2):
+            pyxel.line(x,self.screensize[1]-42,x,self.screensize[1]-39,0)
+        for v in range(self.screensize[0]-112,self.screensize[0]-112+(2*self.music_volume),2):
+            pyxel.line(v,self.screensize[1]-42,v,self.screensize[1]-39,1)
         #design of the music volume button
         #"+" button
-        if 159 <= pyxel.mouse_x <= 164 and 85 <= pyxel.mouse_y <= 90:
-            pyxel.rect(161,85,2,6,0)#vertical line of the "+"
-            pyxel.rect(159,87,6,2,0)#horyzontal line of the "+"
+        if self.screensize[0]-97 <= pyxel.mouse_x <= self.screensize[0]-92 and self.screensize[1]-43 <= pyxel.mouse_y <= self.screensize[1]-38:
+            pyxel.rect(self.screensize[0]-95,self.screensize[1]-43,2,6,0)#vertical line of the "+"
+            pyxel.rect(self.screensize[0]-97,self.screensize[1]-41,6,2,0)#horyzontal line of the "+"
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume<7: self.music_volume+=1
         else:
-            pyxel.rect(161,85,2,6,1)#vertical line of the "+"
-            pyxel.rect(159,87,6,2,1)#horyzontal line of the "+"
+            pyxel.rect(self.screensize[0]-95,self.screensize[1]-43,2,6,1)#vertical line of the "+"
+            pyxel.rect(self.screensize[0]-97,self.screensize[1]-41,6,2,1)#horyzontal line of the "+"
         #"-" button
-        if 169 <= pyxel.mouse_x <= 172 and 87 <= pyxel.mouse_y <= 88:
-            pyxel.rect(169,87,4,2,0)#line of the "-"
+        if self.screensize[0]-87 <= pyxel.mouse_x <= self.screensize[0]-84 and self.screensize[1]-41 <= pyxel.mouse_y <= self.screensize[1]-40:
+            pyxel.rect(self.screensize[0]-87,self.screensize[1]-41,4,2,0)#line of the "-"
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume>0: self.music_volume-=1
         else:
-            pyxel.rect(169,87,4,2,1)#line of the "-"
+            pyxel.rect(self.screensize[0]-87,self.screensize[1]-41,4,2,1)#line of the "-"
 
 
     def menu_update(self):
