@@ -5,6 +5,8 @@ class MenuEngine:
     def __init__(self,app):
         self.app=app
         self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
+        self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
+        self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.target_coins=self.app.total_coins
         self.in_shop=False#Boolean true if the player is in the shop interface and false otherwise
         self.in_popup=False#Boolean true if the player is in the shop interface and wanrts to buy a new item and false otherwise
@@ -18,11 +20,12 @@ class MenuEngine:
         self.selected_ski="Dark_blue_ski"#Name of the selected ski (str)
         self.selected_scarf="Dark_blue_scarf"#Name of the selected scarf (str)
         self.selected_object=""#Name of the selected object (str)
-        self.cases_shop=[["The_Duck",0,True],["Donald",100,False],["Pika_pika",3,False],["The_golden_Duck",100,False],["Maskass",100,False],["Songoku",100,False],["Tortue_ninja",100,False],["Dark_blue_ski",0,True],["Light_blue_ski",100,False],["Yellow_dark_blue_ski",100,False],["Yellow_ski",100,False],["Red_ski",100,False],["Green_and_white_ski",100,False],["Green_ski",100,False],["Dark_blue_scarf",0,True],["Light_blue_scarf",100,False],["Yellow_dak_blue_scarf",100,False],["Yellow_scarf",100,False],["Red_scarf",100,False],["Green_and_white_scarf",100,False],["Green_scarf",100,False],["Shield",0,False],["Chest",100,False],["Bomb",100,False],["Froggy",100,False],["Magnet",100,False],["Key",100,False],["Trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
+        self.cases_shop=[["The_Duck",0,True,"effet à spécifier"],["Donald",100,False,"effet à spécifier"],["Pika_pika",3,False,"effet à spécifier"],["The_golden_Duck",100,False,"effet à spécifier"],["Maskass",100,False,"effet à spécifier"],["Songoku",100,False,"effet à spécifier"],["Tortue_ninja",100,False,"effet à spécifier"],["Dark_blue_ski",0,True],["Light_blue_ski",100,False],["Yellow_dark_blue_ski",100,False],["Yellow_ski",100,False],["Red_ski",100,False],["Green_and_white_ski",100,False],["Green_ski",100,False],["Dark_blue_scarf",0,True],["Light_blue_scarf",100,False],["Yellow_dak_blue_scarf",100,False],["Yellow_scarf",100,False],["Red_scarf",100,False],["Green_and_white_scarf",100,False],["Green_scarf",100,False],["Shield",0,False],["Chest",100,False],["Bomb",100,False],["Froggy",100,False],["Magnet",100,False],["Double_coin",100,False],["Trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
         #Reading the already acquired items and changing the value of the boolean of self.cases_shop according to it
         for i in range(len(app.unlocked_items)-1):
             if not self.cases_shop[i][2]==True:
                 self.cases_shop[i][2]=app.unlocked_items[i]
+
 
     def menu_draw(self):
         #set camera to coordinates (0;0)
@@ -39,12 +42,12 @@ class MenuEngine:
         #draws the menu borders
         for i in range(0,3,2):
             pyxel.rectb(70+i,27+i,self.screensize[0]-140,self.screensize[1]-47,1)
-        
+
         #Title
         text_border("Ski Adventure",self.screensize[0]/2-26,10,1,11)
         
         #Menu design
-        if self.in_shop==False and self.in_settings==False:
+        if self.in_shop==False:
             
             #start button
             if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3:
@@ -54,33 +57,39 @@ class MenuEngine:
             #shop button
             if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
                 text_border("Shop",77,self.screensize[1]-29,1,11)
-                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT): self.in_shop=True
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_settings==False: self.in_shop=True
             else:
                 text_border("Shop",77,self.screensize[1]-30,1,3)
             #settings button
             if self.screensize[0]-107 <= pyxel.mouse_x <= self.screensize[0]-75 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
                 text_border("Settings",self.screensize[0]-106,self.screensize[1]-29,1,11)
-                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT): self.in_settings=True
-            else:
+                if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT): self.in_settings=not self.in_settings
+            elif self.in_settings==False:
                 text_border("Settings",self.screensize[0]-106,self.screensize[1]-30,1,3)
+            else:
+                text_border("Settings",self.screensize[0]-106,self.screensize[1]-29,1,11)
+            
+            #detection of the necessity of settings appearence
+            if self.in_settings==True: self.settings_interface()
 
-        #detection of selected interface
-        elif self.in_shop==True: self.shop_interface()
-        elif self.in_settings==True: self.settings_interface()
-        
+        #detection of the necessity of shop appearence
+        else: self.shop_interface()
+
+
     #Shop interface
     def shop_interface(self):
-        """Draws the shop interface with its logic"""
+        """Draws the shop graphics with its logic"""
         #clicked shop button
         text_border("Shop",77,self.screensize[1]-29,1,11)
 
         #detection of the mouse to leave the shop interface
-        if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+        if self.screensize[0]-179 <= pyxel.mouse_x <= self.screensize[0]-164 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_popup==False:
             self.in_shop=False
 
         if self.app.total_coins>self.target_coins:
             if self.app.total_coins-self.target_coins>=5: self.app.total_coins-=5
             else: self.app.total_coins-=self.app.total_coins-self.target_coins
+        pyxel.text(4,3,str(self.app.total_coins),1)
         pyxel.text(3,3,str(self.app.total_coins),10)
 
         #graphics of the boxes of selection
@@ -143,6 +152,7 @@ class MenuEngine:
 
         if self.in_popup!=False: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))#Drawing a popup for the wanting purchase 
 
+
     def shop_interface_popup_price_item(self,ncase):
         """Draws a popup notifying the player of the price of the item he wants to purchase.
         If the player is ok and has the money needed, it will substract the price to his coins and unlock the choiced item.
@@ -184,26 +194,64 @@ class MenuEngine:
                 self.cases_shop[ncase][2],self.app.unlocked_items[ncase]=True,True
                 self.in_popup=False
 
-    def settings_interface(self):
-        """Draws the grphics of the settings interface with its logic"""
-        #clicked settings button
-        text_border("Settings",self.screensize[0]-106,self.screensize[1]-29,1,11)
 
-        #detection of the mouse to leave the settings interface
-        if self.screensize[0]-107 <= pyxel.mouse_x <= self.screensize[0]-75 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-            self.in_settings=False
+    def settings_interface(self):
+        """Draws the graphics of the settings interface with its logic"""
+        #rect of settings
+        pyxel.rectb(134,71,50,25,1)
         
-        #global volume design
-        pyxel.rect(77,34,2,4,3)
-        pyxel.line(79,33,79,38,3)
-        pyxel.line(80,32,80,39,3)
+        #global global volume design
+        pyxel.rect(138,75,2,4,3)
+        pyxel.line(140,74,140,79,3)
+        pyxel.line(141,73,141,80,3)
+        #line of the global volume with colors changing with the actual global volume (self.global_volume)
+        for x in range(143,143+13,2):
+            pyxel.line(x,75,x,78,0)
+        for v in range(143,143+2*(self.global_volume),2):
+            pyxel.line(v,75,v,78,1)
+        #design of the global volume button
+        #"+" button
+        if 158 <= pyxel.mouse_x <= 163 and 74 <= pyxel.mouse_y <=79:
+            pyxel.rect(160,74,2,6,0)#vertical line of the "+"
+            pyxel.rect(158,76,6,2,0)#horyzontal line of the "+"
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume<7: self.global_volume+=1
+        else:
+            pyxel.rect(160,74,2,6,1)#vertical line of the "+"
+            pyxel.rect(158,76,6,2,1)#horyzontal line of the "+"
+        #"-" button
+        if 168 <= pyxel.mouse_x <= 171 and 76 <= pyxel.mouse_y <= 77:
+            pyxel.rect(168,76,4,2,0)#line of the "-"
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume>0: self.global_volume-=1
+        else:
+            pyxel.rect(168,76,4,2,1)#line of the "-"
 
         #music volume design
-        pyxel.line(74,48,74,49,3)
-        pyxel.rect(75,47,2,4,3)
-        pyxel.line(77,41,77,49,3)#barre principale
-        pyxel.line(78,42,79,43,3)
-        pyxel.line(78,43,80,45,3)
+        pyxel.line(136,89,136,90,3)#first part lest of the 'ball' 
+        pyxel.rect(137,88,2,4,3)#major part of the 'ball'
+        pyxel.line(139,82,139,90,3)#principal line
+        pyxel.line(140,83,141,84,3)#first part of the head
+        pyxel.line(140,84,142,86,3)#second part of the head
+        #line of the music volume with colors changing with the actual music volume (self.music_volume)
+        for x in range(144,144+13,2):
+            pyxel.line(x,86,x,89,0)
+        for v in range(144,144+(2*self.music_volume),2):
+            pyxel.line(v,86,v,89,1)
+        #design of the music volume button
+        #"+" button
+        if 159 <= pyxel.mouse_x <= 164 and 85 <= pyxel.mouse_y <= 90:
+            pyxel.rect(161,85,2,6,0)#vertical line of the "+"
+            pyxel.rect(159,87,6,2,0)#horyzontal line of the "+"
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume<7: self.music_volume+=1
+        else:
+            pyxel.rect(161,85,2,6,1)#vertical line of the "+"
+            pyxel.rect(159,87,6,2,1)#horyzontal line of the "+"
+        #"-" button
+        if 169 <= pyxel.mouse_x <= 172 and 87 <= pyxel.mouse_y <= 88:
+            pyxel.rect(169,87,4,2,0)#line of the "-"
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume>0: self.music_volume-=1
+        else:
+            pyxel.rect(169,87,4,2,1)#line of the "-"
+
 
     def menu_update(self):
         if (pyxel.btnp(pyxel.KEY_SPACE) or (self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT))) and (self.in_shop==False and self.in_settings==False):
