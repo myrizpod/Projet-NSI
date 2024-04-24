@@ -24,11 +24,11 @@ class MenuEngine:
         self.shop_selected_cases_skis=[[81, 48]]#List of list of the coordinates (x and y) of the selected case in the skis line
         self.shop_selected_cases_scarfs=[[81, 65]]#List of list of the coordinates (x and y) of the selected case in the scarfs line
         self.shop_selected_cases_objects=[]#List of list of the coordinates (x and y) of the selected case in the objects line (empty at the beginning, need money to unlock objects)
-        self.selected_skin="The_Duck"#Name of the selected skin (str)
-        self.selected_ski="Dark_blue_ski"#Name of the selected ski (str)
-        self.selected_scarf="Dark_blue_scarf"#Name of the selected scarf (str)
+        self.selected_skin="The Duck"#Name of the selected skin (str)
+        self.selected_ski="Black skis"#Name of the selected ski (str)
+        self.selected_scarf="Black scarf"#Name of the selected scarf (str)
         self.selected_object=""#Name of the selected object (str)
-        self.cases_shop=[["The_Duck",0,True,"effet à spécifier"],["Donald",100,False,"effet à spécifier"],["Pika_pika",3,False,"effet à spécifier"],["The_golden_Duck",100,False,"effet à spécifier"],["Maskass",100,False,"effet à spécifier"],["Songoku",100,False,"effet à spécifier"],["Tortue_ninja",100,False,"effet à spécifier"],["Dark_blue_ski",0,True],["Light_blue_ski",100,False],["Yellow_dark_blue_ski",100,False],["Yellow_ski",100,False],["Red_ski",100,False],["Green_and_white_ski",100,False],["Green_ski",100,False],["Dark_blue_scarf",0,True],["Light_blue_scarf",100,False],["Yellow_dak_blue_scarf",100,False],["Yellow_scarf",100,False],["Red_scarf",100,False],["Green_and_white_scarf",100,False],["Green_scarf",100,False],["Shield",0,False],["Chest",100,False],["Bomb",100,False],["Froggy",100,False],["Magnet",100,False],["Double_coin",100,False],["Trophy",100,False]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
+        self.cases_shop=[["The Duck",0,True,"No effect"],["Donald",100,False,"effet a specifier"],["Pika pika",3,False,"effet a specifier"],["Golden Duck",100,False,"effet a specifier"],["Maskass",100,False,"effet a specifier"],["Songoku",100,False,"effet a specifier"],["Ninja turtle",100,False,"effet a specifier"],["Black skis",0,True,"effet a specifier"],["Blue skis",100,False,"effet a specifier"],["Electric skis",100,False,"effet a specifier"],["Yellow skis",100,False,"effet a specifier"],["Red skis",100,False,"effet a specifier"],["Green_and_white_skis",100,False,"effet a specifier"],["Green skis",100,False,"effet a specifier"],["Black scarf",0,True,"effet a specifier"],["Blue scarf",100,False,"effet a specifier"],["Electric scarf",100,False,"effet a specifier"],["Yellow_scarf",100,False,"effet a specifier"],["Red scarf",100,False,"effet a specifier"],["Green_and_white_scarf",100,False,"effet a specifier"],["Green scarf",100,False,"effet a specifier"],["Shield",0,False,"effet a specifier"],["Chest",100,False,"effet a specifier"],["Bomb",100,False,"effet a specifier"],["Froggy",100,False,"effet a specifier"],["Magnet",100,False,"effet a specifier"],["Coins x2",100,False,"effet a specifier"],["Trophy",100,False,"effet a specifier"]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise))
         #Reading the already acquired items and changing the value of the boolean of self.cases_shop according to it
         for i in range(len(app.unlocked_items)-1):
             if not self.cases_shop[i][2]==True:
@@ -186,8 +186,8 @@ class MenuEngine:
         pyxel.rect(113,77,13,4,5)#background no button
         pyxel.rect(131,77,14,4,5)#background yes button
 
-        pyxel.text(96+1,48+2,self.cases_shop[ncase][0]+" :",1)#show the name of the item to buy in the popup
-        pyxel.text(96+1,48+9,str(self.cases_shop[ncase][1])+" coins",1)#show the price of the item to buy in the popup
+        pyxel.text(96+1,48+2,self.cases_shop[ncase][0]+" :",7)#show the name of the item to buy in the popup
+        pyxel.text(96+1,48+9,str(self.cases_shop[ncase][1])+" coins",10)#show the price of the item to buy in the popup
         if len(self.cases_shop[ncase])==4:
             pyxel.text(96,48+16,"("+self.cases_shop[ncase][3]+")",1)#revealing the item's special effect if it has one
 
