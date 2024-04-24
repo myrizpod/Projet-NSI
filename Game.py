@@ -23,7 +23,7 @@ import random
 class GameEngine:
 
 
-  def __init__(self,screen_size,app,skin="The_Duck",scarf="Dark_blue_scarf",ski="Dark_blue_ski",not_in_menu=True):
+  def __init__(self,screen_size,app,skin="The Duck",scarf="Black scarf",ski="Black ski",not_in_menu=True):
 
     #Variable setup
     self.app=app
@@ -53,10 +53,10 @@ class GameEngine:
     self.coin_distance_min=300 #minimum distance between two coin patches
     self.is_paused=False
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
-    self.coin_mult=1
+    self.coin_mult=0
     self.coin_mult_timer=0
     self.invincible_timer=0
-    self.magnet_timer=990
+    self.magnet_timer=0
     self.double_jump=False
     self.dash=False
     self.jump_timer=0
@@ -70,9 +70,7 @@ class GameEngine:
     """
     the function that runs most of the game, but doesnt do graphics
     """
-    # Disco mode
-    if pyxel.btn(pyxel.KEY_B):
-      self.scarf=Custom(self.app,name=random.choice(["yellow_scarf","red_scarf","green_scarf"]))
+
 
     #check if player is trying to pause/unpause
     if pyxel.btnp(pyxel.KEY_P):
@@ -135,22 +133,25 @@ class GameEngine:
         #calculate obstacle position
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
-        #Randomly spawns 2 types of coins who have different values when picked up  
-        if random.random()<0.5:
-          if random.random()<0.5:
+        #Randomly spawns 2 types of coins who have different values when picked up
+        r=random.random()
+        if r<0.05:
+          r=random.random()
+          if r<=0.16:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet"))
-          elif random.random()<0.2:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
-          elif random.random()<0.2:
+          elif 0.16<r<=0.32:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
-          elif random.random()<0.1:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible"))
-          elif random.random()<0.2: 
+          elif 0.32<r<=0.48:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible")) 
+          elif 0.48<r<=0.64: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
-          else: 
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5))
+          elif r>=0.64:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
+        elif r<0.15:
+          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #piece bleue
         else:
-          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1))
+          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #piece classique
+
           
     #go to def for info
     self.player_movement()
@@ -170,10 +171,10 @@ class GameEngine:
     #jump
     if pyxel.btnp(pyxel.KEY_SPACE) and not self.dead:
       if not self.grounded:
-        if self.double_jump:
+        if self.double_jump and "double_jump" in self.effects:
           self.player_pos[3]=-1.5
           self.double_jump=False
-        if self.dash:
+        if self.dash and "dash" in self.effects:
           self.dashed=True
           self.cam_offset[0]+=int(35*self.player_pos[4])
           self.dash=False
@@ -190,7 +191,7 @@ class GameEngine:
     
 
     
-    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded:
+    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded and "no_flip" not in self.effects:
       self.pdir=(self.pdir+0.15)%8 
 
        
@@ -237,7 +238,7 @@ class GameEngine:
       self.coin_mult=1
     self.invincible_timer=max(0,self.invincible_timer-1)
     self.jump_timer=max(0,self.jump_timer-1)
-    #self.magnet_timer=max(0,self.magnet_timer-1)
+    self.magnet_timer=max(0,self.magnet_timer-1)
     if not self.dead:
       for c in range(len(self.coin_list)):
         coi=self.coin_list[c]
@@ -247,12 +248,14 @@ class GameEngine:
               if coi.effect=="double":
                 self.coin_mult_timer=150
                 self.coin_mult=2
-              self.pieces+=coi.value*self.coin_mult
+              self.pieces=self.pieces+coi.value*self.coin_mult*2 if "double_coins" in self.effects else self.pieces+coi.value*self.coin_mult
               if coi.effect=="invincible":
                 self.invincible_timer=150
               coi.pickup()
               if coi.effect=="jump_boost":
                 self.jump_timer=150
+              if coi.effect=="magnet":
+                self.magnet_timer=150
               coi.pickup()
               if coi.effect=="bomb":
                 self.die()
@@ -308,6 +311,7 @@ class GameEngine:
     #check if player should fall or not + tries to stick it to the ground
     if int(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-12<self.player_pos[1] and self.player_pos[3]>=0:
       #reset downard speed when grounded
+      #pyxel.play(2,2)
       self.player_pos[3]=0
       if not self.grounded:
         if self.pdir<1.5 or self.pdir>7.5:
@@ -342,27 +346,27 @@ class GameEngine:
       self.draw_scarf(self.scarf.texture[2])
       self.draw_player()
       #coin counter
-      pyxel.text(self.cam[0]+1,self.cam[1],"Coins: "+str(self.pieces),1)
-      pyxel.text(self.cam[0],self.cam[1],"Coins: "+str(self.pieces),10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+1,"Coins: "+str(self.pieces),1)
+      pyxel.text(self.cam[0]+1,self.cam[1]+1,"Coins: "+str(self.pieces),10)
       #score counter
-      pyxel.text(self.cam[0]+self.screen_size[0]-19-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),1)
-      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1],'score:'+str(int(self.score/10)),9)
+      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),1)
+      pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),9)
     
     self.snow_draw()
     
     #coin mult coutner
     if self.coin_mult>1:
-      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",1)
-      pyxel.text(self.cam[0],self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",1)
+      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",10)
     if self.invincible_timer>1:
-      pyxel.text(self.cam[0]+1,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",1)
-      pyxel.text(self.cam[0],self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",1)
+      pyxel.text(self.cam[0]+1,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",10)
     if self.jump_timer>1:
-      pyxel.text(self.cam[0]+1,self.cam[1]+16,"Jump boost - "+str(int(self.jump_timer/30))+"s",1)
-      pyxel.text(self.cam[0],self.cam[1]+16,"Jump boost - "+str(int(self.jump_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+24,"Jump boost - "+str(int(self.jump_timer/30))+"s",1)
+      pyxel.text(self.cam[0]+1,self.cam[1]+24,"Jump boost - "+str(int(self.jump_timer/30))+"s",10)
     if self.magnet_timer>1:
-      pyxel.text(self.cam[0]+1,self.cam[1]+16,"Magnet - "+str(int(self.magnet_timer/30))+"s",1)
-      pyxel.text(self.cam[0],self.cam[1]+16,"Magnet - "+str(int(self.magnet_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+32,"Magnet - "+str(int(self.magnet_timer/30))+"s",1)
+      pyxel.text(self.cam[0]+1,self.cam[1]+32,"Magnet - "+str(int(self.magnet_timer/30))+"s",10)
     #pause menu
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
@@ -409,8 +413,9 @@ class GameEngine:
           coin.momentum[1]-=1
         if coin.momentum[1]<=-5:
           to_be_deleted.append(c)
-        if self.magnet_timer>0:
-          coin.momentum[0]-=0.1
+        if self.magnet_timer>0 and abs(self.player_pos[0]-coin.pos[0])<100 and abs(self.player_pos[1]-coin.pos[1])<100 and not coin.picked_up: #check if magnet is active and coins are close enough of the player
+          coin.momentum[0]+=(self.player_pos[0]-coin.pos[0])/300
+          coin.momentum[1]-=(self.player_pos[1]-coin.pos[1])/300
         coin.pos[0]+=coin.momentum[0]
         coin.pos[1]-=coin.momentum[1]
         #draw 
@@ -591,7 +596,7 @@ class coin:
     """
     Defines a momentum(height) for the coins and picking up the coins
     """
-    self.momentum[1]=5
+    self.momentum=[0,5]
     self.picked_up=True
 
 class Custom:
