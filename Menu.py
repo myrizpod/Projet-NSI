@@ -205,7 +205,7 @@ class MenuEngine:
         pyxel.text(96+1,48+2,self.cases_shop[ncase][0]+" :",self.all_colours[self.mode]["info popup"]["popup text item's name color"])#show the name of the item to buy in the popup
         pyxel.text(96+1,48+9,str(self.cases_shop[ncase][1])+" coins",self.all_colours[self.mode]["info popup"]["popup text item's price color"])#show the price of the item to buy in the popup
         if len(self.cases_shop[ncase])==4:
-            pyxel.text(96,48+16,"("+self.cases_shop[ncase][3]+")",self.all_colours[self.mode]["info popup"]["popup text item's effect color"])#revealing the item's special effect if it has one
+            pyxel.text(96,48+16,self.cases_shop[ncase][3],self.all_colours[self.mode]["info popup"]["popup text item's effect color"])#revealing the item's special effect if it has one
 
         #Detection of the mouse coordinates to leave the popup interface
         if 112 <= pyxel.mouse_x <= 126 and 73 <= pyxel.mouse_y <= 81:
