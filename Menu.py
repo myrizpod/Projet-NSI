@@ -18,22 +18,25 @@ class MenuEngine:
                            "main buttons":{"clicked":{"bordercolor":1, "text color":11}, "normal":{"bordercolor":1, "text color":3}},
                            "money text":{"shadow color":1, "text color":10},
                            "shop cases":{"shop cases color":1, "selected shop cases color":11,"shop cases mouseover":12},
-                           "info popup":{"popup background color":5, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":1, "normal":{"popup outlines color":1, "basic popup text color":1}, "clicked":{"popup outlines color":0, "basic popup text color":0}},
-                           "settings graphics":{"settings outline color":1, "global volume logo color":3, "music volume logo color":3, "empty volume lines color":0, "volume lines color":1, "volume buttons color":1, "clicked volume buttons color":0}},
+                           "price popup":{"popup background color":5, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":1, "normal":{"popup buttons's outlines color":1, "popup buttons's text color":1}, "clicked":{"popup buttons's outlines color":0, "popup buttons's text color":0}},
+                           "settings graphics":{"settings outline color":1, "global volume logo color":3, "music volume logo color":3, "empty volume lines color":0, "volume lines color":1, "volume buttons color":1, "clicked volume buttons color":0},
+                           "effect popup":{"popup background color":5, "popup text item's effect color":0, "normal":{"popup buttons's outlines color":1, "popup buttons's text color":1}, "clicked":{"popup buttons's outlines color":0, "popup buttons's text color":0}}},
                         "desert":
                           {"basic text color":0,
                            "title":{"bordercolor":11, "text color":1},
                            "main buttons":{"clicked":{"bordercolor":11, "text color":1}, "normal":{"bordercolor":3, "text color":1}},
                            "money text":{"shadow color":10, "text color":1},
                            "shop cases":{"shop cases color":12, "selected shop cases color":1,"shop cases mouseover":11},
-                           "info popup":{"popup background color":1, "popup text item's name color":0, "popup text item's price color":7, "popup text item's effect color":10, "normal":{"popup outlines color":10, "basic popup text color":10}, "clicked":{"popup outlines color":5, "basic popup text color":5}},
-                           "settings graphics":{"settings outline color":2, "global volume logo color":4, "music volume logo color":4, "empty volume lines color":1, "volume lines color":2, "volume buttons color":2, "clicked volume buttons color":1}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
+                           "price popup":{"popup background color":1, "popup text item's name color":0, "popup text item's price color":7, "popup text item's effect color":10, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":5, "popup buttons's text color":5}},
+                           "settings graphics":{"settings outline color":2, "global volume logo color":4, "music volume logo color":4, "empty volume lines color":1, "volume lines color":2, "volume buttons color":2, "clicked volume buttons color":1},
+                           "effect popup":{"popup background color":0, "popup text item's effect color":5, "normal":{"popup buttons's outlines color":2, "popup buttons's text color":2}, "clicked":{"popup buttons's outlines color":1, "popup buttons's text color":1}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
         self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
         self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.mode="snowy"#The mode of the game (str: "snowy" or "desert")
         self.target_coins=self.app.total_coins#The amount of money, decreasing after a purchase of the player in the shop allowing the animation of -5coins until correct amount (int)
         self.in_shop=False#Boolean true if the player is in the shop interface and false otherwise
         self.in_popup=False#Boolean true if the player is in the shop interface and wanrts to buy a new item and false otherwise
+        self.in_effect_popup=False#Boolean true if player right click on a shop item already purchase allowing the apparition of a popup with infos about the item's effect
         self.in_settings=False#Boolean true if the player is in the settings interface and false otherwise
         self.coo_case_shop=[]#List of all the coordinates of the item's case in the shop interface (now not full but after contains lists of coordinates (x and y))
         self.shop_selected_cases_skins=[[81, 33]]#List of list of the coordinates (x and y) of the selected case in the skins line
@@ -118,30 +121,32 @@ class MenuEngine:
         text_border("Shop",77,self.screensize[1]-29,self.all_colours[self.mode]["main buttons"]["clicked"]["bordercolor"],self.all_colours[self.mode]["main buttons"]["clicked"]["text color"])
 
         #detection of the mouse to leave the shop interface
-        if 76 <= pyxel.mouse_x <= 92 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_popup==False:
+        if 76 <= pyxel.mouse_x <= 92 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_popup==False and self.in_effect_popup==False:
             self.in_shop=False
 
-        #showing the actual amount of money with an animation decreasing it if the player bought something in the shop
-        if self.app.total_coins>self.target_coins:
-            if self.app.total_coins-self.target_coins>=5: self.app.total_coins-=5
-            else: self.app.total_coins-=self.app.total_coins-self.target_coins
-        pyxel.text(4,3,str(self.app.total_coins),self.all_colours[self.mode]["money text"]["shadow color"])#shadow of the text of the amount of money
-        pyxel.text(3,3,str(self.app.total_coins),self.all_colours[self.mode]["money text"]["text color"])#text of the amount of money
+        if self.in_effect_popup==False:
 
-        #graphics of the boxes of selection
-        for y in range(33,49,15):
-            for x in range(81,166,14):
-                if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
-                pyxel.rectb(x,y,12,13,self.all_colours[self.mode]["shop cases"]["shop cases color"])#the two first lines of cases for shop's items
-                pyxel.blt(x+2,y+3,2,((x-81)/14)*16,((y-33)/15)*32,8,8,0)#skins and skis graphics
-        for y in range(65,83,17):
-            for x in range(81,166,14):
-                if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
-                pyxel.rectb(x,y,12,13,self.all_colours[self.mode]["shop cases"]["shop cases color"])#the two last lines of cases for shop's items
-                pyxel.blt(x+2,y+3,2,((x-81)/14)*16,64+((y-65)/17)*32,8,8,0)#scarfs and objects graphics
+            #showing the actual amount of money with an animation decreasing it if the player bought something in the shop
+            if self.app.total_coins>self.target_coins:
+                if self.app.total_coins-self.target_coins>=5: self.app.total_coins-=5
+                else: self.app.total_coins-=self.app.total_coins-self.target_coins
+            pyxel.text(4,3,str(self.app.total_coins),self.all_colours[self.mode]["money text"]["shadow color"])#shadow of the text of the amount of money
+            pyxel.text(3,3,str(self.app.total_coins),self.all_colours[self.mode]["money text"]["text color"])#text of the amount of money
+
+            #graphics of the boxes of selection
+            for y in range(33,49,15):
+                for x in range(81,166,14):
+                    if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
+                    pyxel.rectb(x,y,12,13,self.all_colours[self.mode]["shop cases"]["shop cases color"])#the two first lines of cases for shop's items
+                    pyxel.blt(x+2,y+3,2,((x-81)/14)*16,((y-33)/15)*32,8,8,0)#skins and skis graphics
+            for y in range(65,83,17):
+                for x in range(81,166,14):
+                    if len(self.coo_case_shop)!=28: self.coo_case_shop.append([x,y])
+                    pyxel.rectb(x,y,12,13,self.all_colours[self.mode]["shop cases"]["shop cases color"])#the two last lines of cases for shop's items
+                    pyxel.blt(x+2,y+3,2,((x-81)/14)*16,64+((y-65)/17)*32,8,8,0)#scarfs and objects graphics
         
         #detection of the mouse for shop selection + add the coordinates of the selected case to the list in relation
-        if self.in_popup==False:
+        if self.in_popup==False and self.in_effect_popup==False:
             for i in self.coo_case_shop:
                 if i[0] <= pyxel.mouse_x <= i[0]+12 and i[1] <= pyxel.mouse_y <= i[1]+13:
                     pyxel.rectb(i[0]-1,i[1]-1,14,15,self.all_colours[self.mode]["shop cases"]["shop cases mouseover"])#rectangle appearing whenever the mouse is over a case of a shop's item
@@ -156,37 +161,60 @@ class MenuEngine:
                             elif i[1]==82 and i not in self.shop_selected_cases_objects:
                                 self.shop_selected_cases_objects.append(i)
                         else: self.in_popup=i#Saving the value of the case to buy
+                    elif pyxel.btnp(pyxel.MOUSE_BUTTON_RIGHT) and self.cases_shop[self.coo_case_shop.index(i)][2]==True and len(self.cases_shop[self.coo_case_shop.index(i)])>3:
+                        self.in_effect_popup=i
 
         #highlighting the selected cases using coordinates in the lists in relation + suppression of old selected cases when more than one case per line is selected + add the name of the selected item per line in the related variable to be used in the game file
         #first line, skins
-        if len(self.shop_selected_cases_skins)>0:
-            if len(self.shop_selected_cases_skins)>1:
-                del (self.shop_selected_cases_skins[0:-1])
-            pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected skin in the shop
-            self.selected_skin=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_skins[0])][0]
-        
-        #second line, skis
-        if len(self.shop_selected_cases_skis)>0:
-            if len(self.shop_selected_cases_skis)>1:
-                del (self.shop_selected_cases_skis[0:-1])
-            pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected ski in the shop
-            self.selected_ski=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_skis[0])][0]
-        
-        #third line, scarfs
-        if len(self.shop_selected_cases_scarfs)>0:
-            if len(self.shop_selected_cases_scarfs)>1:
-                del (self.shop_selected_cases_scarfs[0:-1])
-            pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected scarf in the shop
-            self.selected_scarf=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_scarfs[0])][0]
-        
-        #fourth line, objects
-        if len(self.shop_selected_cases_objects)>0:
-            if len(self.shop_selected_cases_objects)>1:
-                del (self.shop_selected_cases_objects[0:-1])
-            pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected object in the shop
-            self.selected_object=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_objects[0])][0]
+        if self.in_effect_popup==False:
+            if len(self.shop_selected_cases_skins)>0:
+                if len(self.shop_selected_cases_skins)>1:
+                    del (self.shop_selected_cases_skins[0:-1])
+                pyxel.rectb(self.shop_selected_cases_skins[0][0],self.shop_selected_cases_skins[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected skin in the shop
+                self.selected_skin=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_skins[0])][0]
+            
+            #second line, skis
+            if len(self.shop_selected_cases_skis)>0:
+                if len(self.shop_selected_cases_skis)>1:
+                    del (self.shop_selected_cases_skis[0:-1])
+                pyxel.rectb(self.shop_selected_cases_skis[0][0],self.shop_selected_cases_skis[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected ski in the shop
+                self.selected_ski=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_skis[0])][0]
+            
+            #third line, scarfs
+            if len(self.shop_selected_cases_scarfs)>0:
+                if len(self.shop_selected_cases_scarfs)>1:
+                    del (self.shop_selected_cases_scarfs[0:-1])
+                pyxel.rectb(self.shop_selected_cases_scarfs[0][0],self.shop_selected_cases_scarfs[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected scarf in the shop
+                self.selected_scarf=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_scarfs[0])][0]
+            
+            #fourth line, objects
+            if len(self.shop_selected_cases_objects)>0:
+                if len(self.shop_selected_cases_objects)>1:
+                    del (self.shop_selected_cases_objects[0:-1])
+                pyxel.rectb(self.shop_selected_cases_objects[0][0],self.shop_selected_cases_objects[0][1],12,13,self.all_colours[self.mode]["shop cases"]["selected shop cases color"])#drawing a rectangle to reveal the selected object in the shop
+                self.selected_object=self.cases_shop[self.coo_case_shop.index(self.shop_selected_cases_objects[0])][0]
 
-        if self.in_popup!=False: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))#Drawing a popup for the wanting purchase 
+        if self.in_popup!=False: self.shop_interface_popup_price_item(self.coo_case_shop.index(self.in_popup))#Drawing a popup with the info about the wanting item to purchase
+        if self.in_effect_popup!=False: self.effect_popup(self.coo_case_shop.index(self.in_effect_popup))#Drawing a popup with effect infos about the selecte item
+
+
+    def effect_popup(self, ncase):
+        """Draws a popup with the item's effect that the player right click on (if already purchased).
+        Arg :
+            ncase (int): the number of the item's case (0 to 27)"""
+        pyxel.rectb(95,48,68,17,self.all_colours[self.mode]["effect popup"]["normal"]["popup buttons's outlines color"])#pricipal popup's rectangle outlines
+        pyxel.rect(96,49,66,15,self.all_colours[self.mode]["effect popup"]["popup background color"])#background of the main window
+        pyxel.rect(123,61,12,7,self.all_colours[self.mode]["effect popup"]["popup background color"])#background of 'ok' button
+        pyxel.text(96,49+2,self.cases_shop[ncase][3],self.all_colours[self.mode]["effect popup"]["popup text item's effect color"])#text with item's effect
+
+        if 122 <= pyxel.mouse_x <= 135 and 60 <= pyxel.mouse_y <= 68:
+            pyxel.rectb(122,60,14,9,self.all_colours[self.mode]["effect popup"]["clicked"]["popup buttons's outlines color"])#outline of 'ok' button if mouse is over
+            pyxel.text(125,62,"Ok",self.all_colours[self.mode]["effect popup"]["clicked"]["popup buttons's text color"])#text of the 'ok' button if mouse is over
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+                self.in_effect_popup=False
+        else:
+            pyxel.rectb(122,60,14,9,self.all_colours[self.mode]["effect popup"]["normal"]["popup buttons's outlines color"])#outline of 'ok' button
+            pyxel.text(125,62,"Ok",self.all_colours[self.mode]["effect popup"]["normal"]["popup buttons's text color"])#text of the 'ok' button
 
 
     def shop_interface_popup_price_item(self,ncase):
@@ -197,37 +225,37 @@ class MenuEngine:
         Arg :
             ncase (int): the number of the item's case (0 to 27)"""
         #popup graphics
-        pyxel.rectb(95,48,68,30,self.all_colours[self.mode]["info popup"]["normal"]["popup outlines color"])#principal popup's rectangle outlines
-        pyxel.rect(96,49,66,28,self.all_colours[self.mode]["info popup"]["popup background color"])#background main window
-        pyxel.rect(113,77,13,4,self.all_colours[self.mode]["info popup"]["popup background color"])#background no button
-        pyxel.rect(131,77,14,4,self.all_colours[self.mode]["info popup"]["popup background color"])#background yes button
+        pyxel.rectb(95,48,68,30,self.all_colours[self.mode]["price popup"]["normal"]["popup buttons's outlines color"])#principal popup's rectangle outlines
+        pyxel.rect(96,49,66,28,self.all_colours[self.mode]["price popup"]["popup background color"])#background of the main window
+        pyxel.rect(113,77,13,4,self.all_colours[self.mode]["price popup"]["popup background color"])#background no button
+        pyxel.rect(131,77,14,4,self.all_colours[self.mode]["price popup"]["popup background color"])#background yes button
 
-        pyxel.text(96+1,48+2,self.cases_shop[ncase][0]+" :",self.all_colours[self.mode]["info popup"]["popup text item's name color"])#show the name of the item to buy in the popup
-        pyxel.text(96+1,48+9,str(self.cases_shop[ncase][1])+" coins",self.all_colours[self.mode]["info popup"]["popup text item's price color"])#show the price of the item to buy in the popup
+        pyxel.text(96+1,48+2,self.cases_shop[ncase][0]+" :",self.all_colours[self.mode]["price popup"]["popup text item's name color"])#show the name of the item to buy in the popup
+        pyxel.text(96+1,48+9,str(self.cases_shop[ncase][1])+" coins",self.all_colours[self.mode]["price popup"]["popup text item's price color"])#show the price of the item to buy in the popup
         if len(self.cases_shop[ncase])==4:
-            pyxel.text(96,48+16,self.cases_shop[ncase][3],self.all_colours[self.mode]["info popup"]["popup text item's effect color"])#revealing the item's special effect if it has one
+            pyxel.text(96,48+16,self.cases_shop[ncase][3],self.all_colours[self.mode]["price popup"]["popup text item's effect color"])#revealing the item's special effect if it has one
 
         #Detection of the mouse coordinates to leave the popup interface
         if 112 <= pyxel.mouse_x <= 126 and 73 <= pyxel.mouse_y <= 81:
-            pyxel.rectb(112,73,15,9,self.all_colours[self.mode]["info popup"]["clicked"]["popup outlines color"])#disagree rectangle's graphics if mouse is over
-            pyxel.text(112+2,73+2,"No",self.all_colours[self.mode]["info popup"]["clicked"]["basic popup text color"])#disagree rectangle's text if mouse is over
+            pyxel.rectb(112,73,15,9,self.all_colours[self.mode]["price popup"]["clicked"]["popup buttons's outlines color"])#disagree rectangle's graphics if mouse is over
+            pyxel.text(112+2,73+2,"No",self.all_colours[self.mode]["price popup"]["clicked"]["popup buttons's text color"])#disagree rectangle's text if mouse is over
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
                 self.in_popup=False
         else:
-            pyxel.rectb(112,73,15,9,self.all_colours[self.mode]["info popup"]["normal"]["popup outlines color"])#disagree rectangle's graphics
-            pyxel.text(112+2,73+2,"No",self.all_colours[self.mode]["info popup"]["normal"]["basic popup text color"])#disagree rectangle's text
+            pyxel.rectb(112,73,15,9,self.all_colours[self.mode]["price popup"]["normal"]["popup buttons's outlines color"])#disagree rectangle's graphics
+            pyxel.text(112+2,73+2,"No",self.all_colours[self.mode]["price popup"]["normal"]["popup buttons's text color"])#disagree rectangle's text
 
         #Detection of the mouse coordinates to purchase (if the player has the correct amount of money) the item to buy
         if 130 <= pyxel.mouse_x <= 144 and 73 <= pyxel.mouse_y <= 81:
-            pyxel.rectb(131,73,15,9,self.all_colours[self.mode]["info popup"]["clicked"]["popup outlines color"])#agree rectangle's graphics if mouse is over
-            pyxel.text(131+2,73+2,"Yes",self.all_colours[self.mode]["info popup"]["clicked"]["basic popup text color"])#agree rectangle's text if mouse i over
+            pyxel.rectb(131,73,15,9,self.all_colours[self.mode]["price popup"]["clicked"]["popup buttons's outlines color"])#agree rectangle's graphics if mouse is over
+            pyxel.text(131+2,73+2,"Yes",self.all_colours[self.mode]["price popup"]["clicked"]["popup buttons's text color"])#agree rectangle's text if mouse i over
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.app.total_coins>=self.cases_shop[ncase][1]:
                 self.target_coins-=self.cases_shop[ncase][1]
                 self.cases_shop[ncase][2],self.app.unlocked_items[ncase]=True,True
                 self.in_popup=False
         else:
-            pyxel.rectb(131,73,15,9,self.all_colours[self.mode]["info popup"]["normal"]["popup outlines color"])#agree rectangle's graphics
-            pyxel.text(131+2,73+2,"Yes",self.all_colours[self.mode]["info popup"]["normal"]["basic popup text color"])#agree rectangle's text
+            pyxel.rectb(131,73,15,9,self.all_colours[self.mode]["price popup"]["normal"]["popup buttons's outlines color"])#agree rectangle's graphics
+            pyxel.text(131+2,73+2,"Yes",self.all_colours[self.mode]["price popup"]["normal"]["popup buttons's text color"])#agree rectangle's text
 
 
     def settings_interface(self):
