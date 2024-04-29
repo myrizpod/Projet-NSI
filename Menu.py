@@ -14,22 +14,24 @@ class MenuEngine:
         self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
         self.all_colours={"snowy":
                           {"basic text color":1,
+                           "outlines color":1,
                            "title":{"bordercolor":1, "text color":11},
                            "main buttons":{"clicked":{"bordercolor":1, "text color":11}, "normal":{"bordercolor":1, "text color":3}},
                            "money text":{"shadow color":1, "text color":10},
                            "shop cases":{"shop cases color":1, "selected shop cases color":11,"shop cases mouseover":12},
                            "price popup":{"popup background color":5, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":1, "normal":{"popup buttons's outlines color":1, "popup buttons's text color":1}, "clicked":{"popup buttons's outlines color":0, "popup buttons's text color":0}},
-                           "settings graphics":{"settings outline color":1, "global volume logo color":3, "music volume logo color":3, "empty volume lines color":0, "volume lines color":1, "volume buttons color":1, "clicked volume buttons color":0},
+                           "settings graphics":{"settings outline color":1, "global volume logo color":3, "music volume logo color":3, "empty volume lines color":0, "volume lines color":3, "volume buttons color":1, "clicked volume buttons color":0},
                            "effect popup":{"popup background color":5, "popup text item's effect color":0, "normal":{"popup buttons's outlines color":1, "popup buttons's text color":1}, "clicked":{"popup buttons's outlines color":0, "popup buttons's text color":0}}},
                         "desert":
                           {"basic text color":0,
-                           "title":{"bordercolor":11, "text color":1},
-                           "main buttons":{"clicked":{"bordercolor":11, "text color":1}, "normal":{"bordercolor":3, "text color":1}},
+                           "outlines color":10,
+                           "title":{"bordercolor":8, "text color":10},
+                           "main buttons":{"clicked":{"bordercolor":8, "text color":14}, "normal":{"bordercolor":8, "text color":10}},
                            "money text":{"shadow color":10, "text color":1},
-                           "shop cases":{"shop cases color":12, "selected shop cases color":1,"shop cases mouseover":11},
-                           "price popup":{"popup background color":1, "popup text item's name color":0, "popup text item's price color":7, "popup text item's effect color":10, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":5, "popup buttons's text color":5}},
-                           "settings graphics":{"settings outline color":2, "global volume logo color":4, "music volume logo color":4, "empty volume lines color":1, "volume lines color":2, "volume buttons color":2, "clicked volume buttons color":1},
-                           "effect popup":{"popup background color":0, "popup text item's effect color":5, "normal":{"popup buttons's outlines color":2, "popup buttons's text color":2}, "clicked":{"popup buttons's outlines color":1, "popup buttons's text color":1}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
+                           "shop cases":{"shop cases color":8, "selected shop cases color":14,"shop cases mouseover":10},
+                           "price popup":{"popup background color":1, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":8, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":9, "popup buttons's text color":9}},
+                           "settings graphics":{"settings outline color":2, "global volume logo color":8, "music volume logo color":8, "empty volume lines color":14, "volume lines color":2, "volume buttons color":8, "clicked volume buttons color":2},
+                           "effect popup":{"popup background color":5, "popup text item's effect color":7, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":8, "popup buttons's text color":8}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
         self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
         self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.mode="snowy"#The mode of the game (str: "snowy" or "desert")
@@ -68,7 +70,7 @@ class MenuEngine:
 
         #draws the menu borders
         for i in range(0,3,2):
-            pyxel.rectb(70+i,27+i,self.screensize[0]-140,self.screensize[1]-47,1)
+            pyxel.rectb(70+i,27+i,self.screensize[0]-140,self.screensize[1]-47,self.all_colours[self.mode]["outlines color"])
 
         #Title
         text_border("Ski Adventure",self.screensize[0]/2-26,10,self.all_colours[self.mode]["title"]["bordercolor"],self.all_colours[self.mode]["title"]["text color"])
@@ -326,9 +328,6 @@ class MenuEngine:
             return True
         else:
             return False
-        
-
-
 
 
 def text_border(text,x,y,borderColor,color):
