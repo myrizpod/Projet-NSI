@@ -60,9 +60,6 @@ class MenuEngine:
         #set camera to coordinates (0;0)
         pyxel.camera(0,0)
 
-        #draws the mouse
-        pyxel.mouse(True)
-
         #reveal the mouse coordinates if the key "b" is pressed
         if pyxel.btn(pyxel.KEY_B):
             pyxel.text(240,self.screensize[1]-15,str(pyxel.mouse_x),self.all_colours[self.mode]["basic text color"])
@@ -115,6 +112,9 @@ class MenuEngine:
         #detection of the necessity of shop appearence
         else: self.shop_interface()
 
+        #draws the mouse
+        if self.mode=="snowy": pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,24,0,8,8,0)
+        else: pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,32,0,8,8,0)
 
     #Shop interface
     def shop_interface(self):
