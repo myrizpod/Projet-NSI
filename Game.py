@@ -60,7 +60,7 @@ class GameEngine:
     self.double_jump=False
     self.dash=False
     self.jump_timer=0
-    self.effects=[]
+    self.effects=["dash","double_jump","score_boost"] #mettre les capacités que l'on veut avoir pendant la partie("no_flip","dash","double_jump","")
     self.dashed=False
     #generation at the beiginning, to avoid holes
     print("Starting Gen")
@@ -349,9 +349,12 @@ class GameEngine:
       pyxel.text(self.cam[0]+2,self.cam[1]+1,"Coins: "+str(self.pieces),1)
       pyxel.text(self.cam[0]+1,self.cam[1]+1,"Coins: "+str(self.pieces),10)
       #score counter
-      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),1)
-      pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),9)
-    
+      if "score_boost" in self.effects:
+        pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(round(int(self.score/9))),1)
+        pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(round(int(self.score/9))),9)
+      else:
+        pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),1)
+        pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),9)
     self.snow_draw()
     
     #coin mult coutner
