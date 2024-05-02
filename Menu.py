@@ -14,22 +14,24 @@ class MenuEngine:
         self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
         self.all_colours={"snowy":
                           {"basic text color":1,
+                           "outlines color":1,
                            "title":{"bordercolor":1, "text color":11},
                            "main buttons":{"clicked":{"bordercolor":1, "text color":11}, "normal":{"bordercolor":1, "text color":3}},
                            "money text":{"shadow color":1, "text color":10},
                            "shop cases":{"shop cases color":1, "selected shop cases color":11,"shop cases mouseover":12},
                            "price popup":{"popup background color":5, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":1, "normal":{"popup buttons's outlines color":1, "popup buttons's text color":1}, "clicked":{"popup buttons's outlines color":0, "popup buttons's text color":0}},
-                           "settings graphics":{"settings outline color":1, "global volume logo color":3, "music volume logo color":3, "empty volume lines color":0, "volume lines color":1, "volume buttons color":1, "clicked volume buttons color":0},
+                           "settings graphics":{"settings outline color":1, "global volume logo color":3, "music volume logo color":3, "empty volume lines color":0, "volume lines color":3, "volume buttons color":1, "clicked volume buttons color":0},
                            "effect popup":{"popup background color":5, "popup text item's effect color":0, "normal":{"popup buttons's outlines color":1, "popup buttons's text color":1}, "clicked":{"popup buttons's outlines color":0, "popup buttons's text color":0}}},
                         "desert":
                           {"basic text color":0,
-                           "title":{"bordercolor":11, "text color":1},
-                           "main buttons":{"clicked":{"bordercolor":11, "text color":1}, "normal":{"bordercolor":3, "text color":1}},
+                           "outlines color":10,
+                           "title":{"bordercolor":8, "text color":10},
+                           "main buttons":{"clicked":{"bordercolor":8, "text color":14}, "normal":{"bordercolor":8, "text color":10}},
                            "money text":{"shadow color":10, "text color":1},
-                           "shop cases":{"shop cases color":12, "selected shop cases color":1,"shop cases mouseover":11},
-                           "price popup":{"popup background color":1, "popup text item's name color":0, "popup text item's price color":7, "popup text item's effect color":10, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":5, "popup buttons's text color":5}},
-                           "settings graphics":{"settings outline color":2, "global volume logo color":4, "music volume logo color":4, "empty volume lines color":1, "volume lines color":2, "volume buttons color":2, "clicked volume buttons color":1},
-                           "effect popup":{"popup background color":0, "popup text item's effect color":5, "normal":{"popup buttons's outlines color":2, "popup buttons's text color":2}, "clicked":{"popup buttons's outlines color":1, "popup buttons's text color":1}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
+                           "shop cases":{"shop cases color":8, "selected shop cases color":14,"shop cases mouseover":10},
+                           "price popup":{"popup background color":1, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":8, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":9, "popup buttons's text color":9}},
+                           "settings graphics":{"settings outline color":2, "global volume logo color":8, "music volume logo color":8, "empty volume lines color":14, "volume lines color":2, "volume buttons color":8, "clicked volume buttons color":2},
+                           "effect popup":{"popup background color":5, "popup text item's effect color":7, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":8, "popup buttons's text color":8}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
         self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
         self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.mode="snowy"#The mode of the game (str: "snowy" or "desert")
@@ -47,7 +49,7 @@ class MenuEngine:
         self.selected_ski="Black skis"#Name of the selected ski (str)
         self.selected_scarf="Black scarf"#Name of the selected scarf (str)
         self.selected_object=""#Name of the selected object (str)
-        self.cases_shop=[["The Duck",0,True,"Flip"],["Donald",100,False,"Double Saut"],["Pika pika",100,False,"Dash"],["Golden Duck",100,False,"double pieces"],["Maskass",100,False,"dash/double saut"],["Songoku",100,False,"flip/double saut"],["Ninja turtle",100,False,"flip/dash"],["Black skis",0,True,"no effect"],["Blue skis",100,False,"score boost X1.1"],["Electric skis",150,False,"score boost X1.15"],["Yellow skis",200,False,"score boost X1.2"],["Red skis",250,False,"score boost X1.25"],["Snowy skis",300,False,"score boost X1.3"],["Green skis",500,False,"score boost X1.5"],["Black scarf",0,True,"no effect"],["Blue scarf",100,False,"no effect"],["Electric scarf",100,False,"no effect"],["Yellow_scarf",100,False,"no effect"],["Red scarf",100,False,"no effect"],["Green_and_white_scarf",100,False,"no effect"],["Green scarf",100,False,"no effect"],["Shield",0,False,"Bouclier 1 fois"],["Chest",100,False,"item aleatoire"],["Bomb",100,False,"enleve les bombes"],["Froggy",100,False,"saute plus haut"],["Magnet",100,False,"attire les pieces"],["Coins x2",100,False,"pieces X2"],["Trophy",100,False,"Pour le meilleur"]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise), arg 3(if available): str(object'effect))
+        self.cases_shop=[["The Duck",0,True,"No effect"],["Donald",100,False,"effet a specifier"],["Pika pika",3,False,"effet a specifier"],["Golden Duck",100,False,"effet a specifier"],["Maskass",100,False,"effet a specifier"],["Songoku",100,False,"effet a specifier"],["Ninja turtle",100,False,"effet a specifier"],["Black skis",0,True],["Blue skis",100,False],["Electric skis",100,False],["Yellow skis",100,False],["Red skis",100,False],["Snowy skis",100,False],["Green skis",100,False],["Black scarf",0,True],["Blue scarf",100,False],["Electric scarf",100,False],["Yellow_scarf",100,False],["Red scarf",100,False],["Green_and_white_scarf",100,False],["Green scarf",100,False],["Shield",0,False,"effet a specifier"],["Chest",100,False,"effet a specifier"],["Bomb",100,False,"effet a specifier"],["Froggy",100,False,"effet a specifier"],["Magnet",100,False,"effet a specifier"],["Coins x2",100,False,"effet a specifier"],["Trophy",100,False,"effet a specifier"]]##List of list with info on every shop cases (arg 0: name(str), arg 1: price(int), arg 2: boolean(true if unlocked, false otherwise), arg 3(if available): str(object'effect))
         #Reading the already acquired items and changing the value of the boolean of self.cases_shop according to it
         for i in range(len(app.unlocked_items)-1):
             if not self.cases_shop[i][2]==True:
@@ -58,9 +60,6 @@ class MenuEngine:
         #set camera to coordinates (0;0)
         pyxel.camera(0,0)
 
-        #draws the mouse
-        pyxel.mouse(True)
-
         #reveal the mouse coordinates if the key "b" is pressed
         if pyxel.btn(pyxel.KEY_B):
             pyxel.text(240,self.screensize[1]-15,str(pyxel.mouse_x),self.all_colours[self.mode]["basic text color"])
@@ -68,14 +67,14 @@ class MenuEngine:
 
         #draws the menu borders
         for i in range(0,3,2):
-            pyxel.rectb(70+i,27+i,self.screensize[0]-140,self.screensize[1]-47,1)
+            pyxel.rectb(70+i,27+i,self.screensize[0]-140,self.screensize[1]-47,self.all_colours[self.mode]["outlines color"])
 
         #Title
         text_border("Ski Adventure",self.screensize[0]/2-26,10,self.all_colours[self.mode]["title"]["bordercolor"],self.all_colours[self.mode]["title"]["text color"])
         
         #Menu design
         if self.in_shop==False:
-            
+            pyxel.text(4,3,"Best score: "+str(self.app.best_score),self.all_colours[self.mode]["basic text color"])
             #start button
             if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3:
                 text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-1,self.all_colours[self.mode]["main buttons"]["clicked"]["bordercolor"],self.all_colours[self.mode]["main buttons"]["clicked"]["text color"])#the start button if the mouse is over
@@ -83,15 +82,15 @@ class MenuEngine:
                 text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-2,self.all_colours[self.mode]["main buttons"]["normal"]["bordercolor"],self.all_colours[self.mode]["main buttons"]["normal"]["text color"])#the start button if the mouse is not over
             #mode button
             if self.mode=="snowy":
-                if self.screensize[0]-92 <= pyxel.mouse_x <= self.screensize[0]-75 and 32 <= pyxel.mouse_y <= 50:
-                    pyxel.blt(self.screensize[0]-92,32,0,32,32,19,19,0)#the flake button graphics if the mouse is over
+                if self.screensize[0]-23 <= pyxel.mouse_x <= self.screensize[0]-5 and 4 <= pyxel.mouse_y <= 22:
+                    pyxel.blt(self.screensize[0]-23,4,0,32,32,19,19,0)#the flake button graphics if the mouse is over
                 else:
-                    pyxel.blt(self.screensize[0]-92,32,0,0,32,19,19,0)#the flake button graphics if the mouse is not over
+                    pyxel.blt(self.screensize[0]-23,4,0,0,32,19,19,0)#the flake button graphics if the mouse is not over
             if self.mode=="desert":
-                if self.screensize[0]-98 <= pyxel.mouse_x <= self.screensize[0]-75 and 32 <= pyxel.mouse_y <= 56:
-                    pyxel.blt(self.screensize[0]-98,32,0,43,68,25,25,13)#the sun button graphics if the mouse is over
+                if self.screensize[0]-29 <= pyxel.mouse_x <= self.screensize[0]-5 and 4 <= pyxel.mouse_y <= 28:
+                    pyxel.blt(self.screensize[0]-29,4,0,43,68,25,25,13)#the sun button graphics if the mouse is over
                 else:
-                    pyxel.blt(self.screensize[0]-98,32,0,11,68,25,25,13)#the sun button graphics if the mouse is not over
+                    pyxel.blt(self.screensize[0]-29,4,0,11,68,25,25,13)#the sun button graphics if the mouse is not over
             #shop button
             if 76 <= pyxel.mouse_x <= 92 and self.screensize[1]-31 <= pyxel.mouse_y <= self.screensize[1]-24:
                 text_border("Shop",77,self.screensize[1]-29,self.all_colours[self.mode]["main buttons"]["clicked"]["bordercolor"],self.all_colours[self.mode]["main buttons"]["clicked"]["text color"])#the shop button if the mouse is over
@@ -113,6 +112,9 @@ class MenuEngine:
         #detection of the necessity of shop appearence
         else: self.shop_interface()
 
+        #draws the mouse
+        if self.mode=="snowy": pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,24,0,8,8,0)
+        else: pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,32,0,8,8,0)
 
     #Shop interface
     def shop_interface(self):
@@ -130,8 +132,8 @@ class MenuEngine:
             if self.app.total_coins>self.target_coins:
                 if self.app.total_coins-self.target_coins>=5: self.app.total_coins-=5
                 else: self.app.total_coins-=self.app.total_coins-self.target_coins
-            pyxel.text(4,3,str(self.app.total_coins),self.all_colours[self.mode]["money text"]["shadow color"])#shadow of the text of the amount of money
-            pyxel.text(3,3,str(self.app.total_coins),self.all_colours[self.mode]["money text"]["text color"])#text of the amount of money
+            pyxel.text(4,3,"Coins: "+str(self.app.total_coins),self.all_colours[self.mode]["money text"]["shadow color"])#shadow of the text of the amount of money
+            pyxel.text(3,3,"Coins: "+str(self.app.total_coins),self.all_colours[self.mode]["money text"]["text color"])#text of the amount of money
 
             #graphics of the boxes of selection
             for y in range(33,49,15):
@@ -317,18 +319,14 @@ class MenuEngine:
 
 
     def menu_update(self):
-        if self.screensize[0]-82 <= pyxel.mouse_x <= self.screensize[0]-75 and 32 <= pyxel.mouse_y <= 39 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.in_settings==False and self.in_shop==False:
-            if self.mode=="snowy":
-                self.mode="desert"
-            else:
-                self.mode="snowy"
+        if self.screensize[0]-23 <= pyxel.mouse_x <= self.screensize[0]-5 and 4 <= pyxel.mouse_y <= 22 and self.mode=="snowy" and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            self.mode="desert"
+        elif self.screensize[0]-29 <= pyxel.mouse_x <= self.screensize[0]-5 and 4 <= pyxel.mouse_y <= 28 and self.mode=="desert" and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            self.mode="snowy"
         if (pyxel.btnp(pyxel.KEY_SPACE) or (self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3 and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT))) and (self.in_shop==False and self.in_settings==False):
             return True
         else:
             return False
-        
-
-
 
 
 def text_border(text,x,y,borderColor,color):
