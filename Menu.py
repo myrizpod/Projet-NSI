@@ -74,7 +74,8 @@ class MenuEngine:
         
         #Menu design
         if self.in_shop==False:
-            pyxel.text(4,3,"Best score: "+str(self.app.best_score),self.all_colours[self.mode]["basic text color"])
+            pyxel.text(4,3,"Best score: "+str(self.app.best_score),self.all_colours[self.mode]["basic text color"])#reveal the best score of the player if he is in the menu (not self.in_shop)
+
             #start button
             if self.screensize[0]/2-10 <= pyxel.mouse_x <= self.screensize[0]/2+10 and self.screensize[1]/2-4 <= pyxel.mouse_y <= self.screensize[1]/2+3:
                 text_border("START",self.screensize[0]/2-9,self.screensize[1]/2-1,self.all_colours[self.mode]["main buttons"]["clicked"]["bordercolor"],self.all_colours[self.mode]["main buttons"]["clicked"]["text color"])#the start button if the mouse is over
