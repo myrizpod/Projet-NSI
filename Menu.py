@@ -1,17 +1,11 @@
 import pyxel
-"""
-To do:
-    - optimize the popup graphics /
-    - replace the coordinates with variables /
-    - make the popup show the effect of the wanted item (if there is one) /
-    - create the mode button of desert/snow with its logic /
-    - replace the colors of the graphics with variables depending on the game's mode /
-"""
+
 class MenuEngine:
     #Everything related to the menu
     def __init__(self,app):
+        #Variable setup
         self.app=app
-        self.screensize=[256,128]#List of the size of the screen (arg 0: width, arg 1: height)
+        self.screensize=self.app.screen_size#List of the size of the screen (arg 0: width, arg 1: height)
         self.all_colours={"snowy":
                           {"basic text color":1,
                            "outlines color":1,
@@ -27,15 +21,15 @@ class MenuEngine:
                            "outlines color":10,
                            "title":{"bordercolor":8, "text color":10},
                            "main buttons":{"clicked":{"bordercolor":8, "text color":14}, "normal":{"bordercolor":8, "text color":10}},
-                           "money text":{"shadow color":10, "text color":1},
+                           "money text":{"shadow color":9, "text color":10},
                            "shop cases":{"shop cases color":8, "selected shop cases color":14,"shop cases mouseover":10},
-                           "price popup":{"popup background color":1, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":8, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":9, "popup buttons's text color":9}},
+                           "price popup":{"popup background color":15, "popup text item's name color":7, "popup text item's price color":10, "popup text item's effect color":8, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":9, "popup buttons's text color":9}},
                            "settings graphics":{"settings outline color":2, "global volume logo color":8, "music volume logo color":8, "empty volume lines color":14, "volume lines color":2, "volume buttons color":8, "clicked volume buttons color":2},
-                           "effect popup":{"popup background color":5, "popup text item's effect color":7, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":8, "popup buttons's text color":8}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
+                           "effect popup":{"popup background color":15, "popup text item's effect color":7, "normal":{"popup buttons's outlines color":10, "popup buttons's text color":10}, "clicked":{"popup buttons's outlines color":8, "popup buttons's text color":8}}}}#Dictionnary of dictionnary of... with the colors (int (0 to 15)) of all graphical element of the start menu depending on the game mode
         self.global_volume=3#Global volume of all game's sounds (int: (0 to 7))
         self.music_volume=2#Volume of the game's music (int: (0 to 7))
         self.mode="snowy"#The mode of the game (str: "snowy" or "desert")
-        self.target_coins=self.app.total_coins #The amount of money, decreasing after a purchase of the player in the shop allowing the animation of -5coins until correct amount (int)
+        self.target_coins=self.app.total_coins#The amount of money, decreasing after a purchase of the player in the shop allowing the animation of -5coins until correct amount (int)
         self.in_shop=False#Boolean true if the player is in the shop interface and false otherwise
         self.in_popup=False#Boolean true if the player is in the shop interface and wanrts to buy a new item and false otherwise
         self.in_effect_popup=False#Boolean true if player right click on a shop item already purchase allowing the apparition of a popup with infos about the item's effect
@@ -114,8 +108,8 @@ class MenuEngine:
         else: self.shop_interface()
 
         #draws the mouse
-        if self.mode=="snowy": pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,24,0,8,8,0)
-        else: pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,32,0,8,8,0)
+        if self.mode=="snowy": pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,32,0,8,8,0)
+        else: pyxel.blt(pyxel.mouse_x,pyxel.mouse_y,0,40,0,8,8,0)
 
     #Shop interface
     def shop_interface(self):
