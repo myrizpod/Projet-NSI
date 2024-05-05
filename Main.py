@@ -11,6 +11,7 @@ class App:
         self.p_inGame=False
         self.inGame=False
         tmp=Save.load()
+        self.mode="snowy"
         self.total_coins=int(tmp["coins"])
         self.best_score=int(tmp["best_score"])
         tmp=tmp["unlocked_items"][1:-1].split(",")#Selection of the list (trunc to get the useful part) with the unlocked items and split it
@@ -21,18 +22,27 @@ class App:
         #wierd place to initialise game and menu but needed otherwise pyxel gets mad
         self.menu=MenuEngine(self)
         game=GameEngine(self.screen_size,self,not_in_menu=False) 
-        pyxel.run(self.update, self.draw)
+        pyxel.run(self.update, self.draw)     
 
     def draw(self):
         #choose wether or not menu should be shown
         game.game_draw()
         if not self.inGame:
-            self.menu.menu_draw()  
+            self.menu.menu_draw()
 
     def update(self):
+        global game
         #switch between runing the menu and the game
         if self.p_inGame==False and self.inGame==True:
-            game.__init__(self.screen_size,self,skin=self.menu.selected_skin,scarf=self.menu.selected_scarf,ski=self.menu.selected_ski,not_in_menu=True)
+            self.mode=self.menu.mode
+            effects=[]
+            for i in range(len(self.menu.cases_shop)):
+                if self.menu.cases_shop[i][0]==self.menu.selected_skin or self.menu.selected_scarf or self.menu.selected_ski:
+                    try: #avoid errors with objects that dont give any effects
+                        effects.append(self.menu.cases_shop[i][3])
+                    except:
+                        pass
+            game.__init__(self.screen_size,self,skin=self.menu.selected_skin,scarf=self.menu.selected_scarf,ski=self.menu.selected_ski,theme=self.mode,effects=effects,not_in_menu=True)
         self.p_inGame=self.inGame
 
         #used properly quit the game (gonna use it for save files)
@@ -46,5 +56,9 @@ class App:
             game.game_update()
         else:
             self.inGame=self.menu.menu_update()
+            self.mode=self.menu.mode
+            game.theme=self.menu.mode
+            game.colors=game.global_colors[self.mode]
+
 
 App()

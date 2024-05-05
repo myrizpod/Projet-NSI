@@ -23,7 +23,7 @@ import random
 class GameEngine:
 
 
-  def __init__(self,screen_size,app,skin="The Duck",scarf="Black scarf",ski="Black ski",not_in_menu=True):
+  def __init__(self,screen_size,app,skin="The Duck",scarf="Black scarf",ski="Black ski",theme="snowy",effects=[],not_in_menu=True):
 
     #Variable setup
     self.app=app
@@ -48,21 +48,28 @@ class GameEngine:
     self.obstacle_distance_min=200 #minimum distance between two obstacles
     self.score=0 #score of the player
     self.pieces=0 #number of coins of the player
-    self.snow_col=[None,12,6,7] #colors for different snowflake layers
     self.coin_distance=0 #current distance between screen border and last coin patch
     self.coin_distance_min=300 #minimum distance between two coin patches
-    self.is_paused=False
+    self.is_paused=False #defines wether the game is paused or not
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
-    self.coin_mult=0
-    self.coin_mult_timer=0
-    self.invincible_timer=0
-    self.magnet_timer=0
-    self.double_jump=False
-    self.dash=False
-    self.jump_timer=0
-    self.effects=["dash","double_jump","score_boost"] #mettre les capacités que l'on veut avoir pendant la partie("no_flip","dash","double_jump","")
-    self.dashed=False
+    self.coin_mult=0 #current coin multiplicator
+    self.coin_mult_timer=0 #time left for the coin multiplicator
+    self.invincible_timer=0 #time left for invisiblility
+    self.magnet_timer=0 #time left for the magnet
+    self.double_jump=False #is next jump a double jump?
+    self.dash=False #is next jump a dash?
+    self.jump_boost_timer=0 #time left for jump boost
+    self.effects=effects #mettre les capacités que l'on veut avoir pendant la partie("no_flip","dash","double_jump","")
+    self.dashed=False #True the frame after the dash, else false (for fancy trail)
+    self.speed_bonus=0 #a bonus speed that is added to the current player speed
+    self.gained_bonus_score=0 #how much bonus score did the player gain this frame
+    self.theme=theme # color scheme of the game
+    self.global_colors ={'snowy':[5,7,6,12,1,10,9],'desert':[15,10,9,4,4,6,5]} #defines the color of the game for both themes the lists are [sky,light,medium,dark,black,text_light,text_dark]
+    self.colors=self.global_colors[theme] #choose the right color depending on the theme
+    self.snow_col=[None,self.colors[3],self.colors[2],self.colors[1]] #colors for different snowflake layers
     #generation at the beiginning, to avoid holes
+
+    #Generating the base terrain
     print("Starting Gen")
     self.gen_terrain(self.screen_size[0]*15)
     print("Added points")
@@ -73,9 +80,9 @@ class GameEngine:
 
 
     #check if player is trying to pause/unpause
-    if pyxel.btnp(pyxel.KEY_P):
+    if pyxel.btnp(pyxel.KEY_P) and not self.dead:
       if self.is_paused:
-        self.is_paused=False
+        self.is_paused=False 
       else:
         self.is_paused=True
     #quit if currently paused
@@ -89,7 +96,7 @@ class GameEngine:
     #update score, quicker = more score/iteration
     self.score+=self.player_pos[4]
     if not self.dead:
-      self.player_pos[4]=max(self.player_pos[4],self.score/500)
+      self.player_pos[4]=max(self.player_pos[4],self.score/2500) #adjust speed
     #remove unused terrain points (behind the player)-
     if self.terrain[1][0]+self.cam_offset[0]*10+100<self.player_pos[0]*10:
       self.terrain.pop(0)
@@ -99,6 +106,9 @@ class GameEngine:
     #generate new terrain points when needed
     if self.terrain[-1][0]-self.screen_size[0]*10<=(self.player_pos[0]+50)*10:
       self.gen_terrain(1)
+
+
+    self.speed_bonus=max(0,self.speed_bonus-0.1)
 
 
     
@@ -112,14 +122,22 @@ class GameEngine:
       pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])]
       y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0])*10),pointA,pointB)/10)
       #choose a random obstacle type using the propper obstacle class
-      r=random.random()
-      if r>1/2:
-        self.obstacle_list.append(obstacle(self.player_pos[0]+246,y-8,'rock'))
-      elif r<1/4:
-        self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'tree'))
-      else:  
-        self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'tree_snowy'))
-
+      if self.theme=="snowy":
+        r=random.random()
+        if r>1/2:
+          self.obstacle_list.append(obstacle(self.player_pos[0]+246,y-8,'rock'))
+        elif r<1/4:
+          self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'tree'))
+        else:  
+          self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'tree_snowy'))
+      else:
+        r=random.random()
+        if r>1/2:
+          self.obstacle_list.append(obstacle(self.player_pos[0]+246,y-8,'rock'))
+        elif r<1/4:
+          self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'palmtree'))
+        else:  
+          self.obstacle_list.append(obstacle(self.player_pos[0]+242,y-16,'cactus'))
       
       
     #coin patch generaton
@@ -133,7 +151,7 @@ class GameEngine:
         #calculate obstacle position
         pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0]+i)]
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
-        #Randomly spawns 2 types of coins who have different values when picked up
+        #Randomly spawns all the types of coins
         r=random.random()
         if r<0.05:
           r=random.random()
@@ -148,14 +166,15 @@ class GameEngine:
           elif r>=0.64:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
         elif r<0.15:
-          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #piece bleue
+          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #blue coin
         else:
-          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #piece classique
+          self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #yellow coin
 
           
     #go to def for info
     self.player_movement()
 
+    #calculates the next closest point of the terain relative to the player position (for collisions)
     self.update_player_points()
     #updates camera position based on player pos
     self.cam=[self.player_pos[0]-self.cam_offset[0],self.player_pos[1]-self.cam_offset[1]]
@@ -186,7 +205,7 @@ class GameEngine:
         if "dash" in self.effects:
           self.dash=True
         self.player_pos[3]=-2
-        if self.jump_timer>0:
+        if self.jump_boost_timer>0:
           self.player_pos[3]=-3
     
 
@@ -237,7 +256,7 @@ class GameEngine:
     if self.coin_mult_timer==0:
       self.coin_mult=1
     self.invincible_timer=max(0,self.invincible_timer-1)
-    self.jump_timer=max(0,self.jump_timer-1)
+    self.jump_boost_timer=max(0,self.jump_boost_timer-1)
     self.magnet_timer=max(0,self.magnet_timer-1)
     if not self.dead:
       for c in range(len(self.coin_list)):
@@ -245,20 +264,21 @@ class GameEngine:
         if not coi.picked_up:
           for i in range(0,9):
             if coi.pos[0]<self.player_pos[0]+i<coi.pos[0]+4 and coi.pos[1]<self.player_pos[1]+i<coi.pos[1]+4:
-              if coi.effect=="double":
-                self.coin_mult_timer=150
-                self.coin_mult=2
-              self.pieces=self.pieces+coi.value*self.coin_mult*2 if "double_coins" in self.effects else self.pieces+coi.value*self.coin_mult
-              if coi.effect=="invincible":
-                self.invincible_timer=150
-              coi.pickup()
-              if coi.effect=="jump_boost":
-                self.jump_timer=150
-              if coi.effect=="magnet":
-                self.magnet_timer=150
-              coi.pickup()
               if coi.effect=="bomb":
                 self.die()
+              elif coi.effect=="double":
+                self.coin_mult_timer=150
+                self.coin_mult=2
+              
+              elif coi.effect=="invincible":
+                self.invincible_timer=150
+              elif coi.effect=="jump_boost":
+                self.jump_boost_timer=150
+              elif coi.effect=="magnet":
+                self.magnet_timer=150
+              coi.pickup()
+              pyxel.play(1,2)
+              self.pieces=self.pieces+coi.value*self.coin_mult*2 if "double_coins" in self.effects else self.pieces+coi.value*self.coin_mult
               break      
 
             
@@ -289,12 +309,17 @@ class GameEngine:
     """a bunch of things to update player properties relative to the movement
     """
     #moves the player his speed
-    self.player_pos[0]+=self.player_pos[4]
+    self.player_pos[0]+=self.player_pos[4]+self.speed_bonus
     #calculates whether the player is grounded or not
     pointA,pointB=self.terrain[self.player_pos[2]-1],self.terrain[self.player_pos[2]]
     if int(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-8>self.player_pos[1]:
       self.grounded=False
       #if not grounded, vertical speed goes up
+      if self.pdir>7.5: #flip bonus
+            self.pdir=0
+            self.speed_bonus+=3
+            self.score+=int(self.player_pos[4]*100)
+            pyxel.play(1,1)
       self.player_pos[3]+=0.1
     else:
       if not self.grounded:
@@ -321,6 +346,9 @@ class GameEngine:
       self.grounded=True
       #tries to stick the player to the ground if close enough (so that light slopes feel smoother)
       self.player_pos[1]=(pointB[1]/10-self.terrain_y(pointB[0]-(self.player_pos[0]*10),pointA,pointB)/10)-8
+
+
+    #add vertical speed to position
     self.player_pos[1]+=self.player_pos[3]
 
  
@@ -329,7 +357,7 @@ class GameEngine:
     Draws all visible elements on the scree including text (score,coins,death)
     """
     #clear the screen with blue sky
-    pyxel.cls(5)
+    pyxel.cls(self.colors[0])
     pyxel.camera(self.cam[0],self.cam[1]) #update camera to the position stored in the variable self.cam[X,Y]
     #refer to function docstring for more info
     self.draw_terrain()
@@ -339,6 +367,7 @@ class GameEngine:
       [1,2,8,9,10]
     if self.not_in_menu:
       if self.dashed:
+        pyxel.play(2,3)
         for i in range(int(35*self.player_pos[4])) :
           self.player_pos[0]+=1
           self.draw_player()
@@ -346,30 +375,34 @@ class GameEngine:
       self.draw_scarf(self.scarf.texture[2])
       self.draw_player()
       #coin counter
-      pyxel.text(self.cam[0]+2,self.cam[1]+1,"Coins: "+str(self.pieces),1)
-      pyxel.text(self.cam[0]+1,self.cam[1]+1,"Coins: "+str(self.pieces),10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+1,"Coins: "+str(self.pieces),self.colors[4])
+      pyxel.text(self.cam[0]+1,self.cam[1]+1,"Coins: "+str(self.pieces),self.colors[5])
       #score counter
       if "score_boost" in self.effects:
-        pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(round(int(self.score/9))),1)
-        pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(round(int(self.score/9))),9)
-      else:
-        pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),1)
-        pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),9)
-    self.snow_draw()
+        pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[4])
+        pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[6])
+
+      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),1)
+      pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[6])
+
+    if self.theme=="snowy": #only generate snow if theme is snowy
+      self.snow_draw()
+    else:
+      self.snow_flake_list=[] #clears the list of the remaining particles if not snowy
     
     #coin mult coutner
     if self.coin_mult>1:
-      pyxel.text(self.cam[0]+2,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",1)
-      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",self.colors[4])
+      pyxel.text(self.cam[0]+1,self.cam[1]+8,"x"+str(self.coin_mult)+" - "+str(int(self.coin_mult_timer/30))+"s",self.colors[5])
     if self.invincible_timer>1:
-      pyxel.text(self.cam[0]+2,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",1)
-      pyxel.text(self.cam[0]+1,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",10)
-    if self.jump_timer>1:
-      pyxel.text(self.cam[0]+2,self.cam[1]+24,"Jump boost - "+str(int(self.jump_timer/30))+"s",1)
-      pyxel.text(self.cam[0]+1,self.cam[1]+24,"Jump boost - "+str(int(self.jump_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",self.colors[4])
+      pyxel.text(self.cam[0]+1,self.cam[1]+16,"invincible - "+str(int(self.invincible_timer/30))+"s",self.colors[5])
+    if self.jump_boost_timer>1:
+      pyxel.text(self.cam[0]+2,self.cam[1]+24,"Jump boost - "+str(int(self.jump_boost_timer/30))+"s",self.colors[4])
+      pyxel.text(self.cam[0]+1,self.cam[1]+24,"Jump boost - "+str(int(self.jump_boost_timer/30))+"s",self.colors[5])
     if self.magnet_timer>1:
-      pyxel.text(self.cam[0]+2,self.cam[1]+32,"Magnet - "+str(int(self.magnet_timer/30))+"s",1)
-      pyxel.text(self.cam[0]+1,self.cam[1]+32,"Magnet - "+str(int(self.magnet_timer/30))+"s",10)
+      pyxel.text(self.cam[0]+2,self.cam[1]+32,"Magnet - "+str(int(self.magnet_timer/30))+"s",self.colors[4])
+      pyxel.text(self.cam[0]+1,self.cam[1]+32,"Magnet - "+str(int(self.magnet_timer/30))+"s",self.colors[5])
     #pause menu
     if self.is_paused:
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,0,80,16,0)
@@ -377,13 +410,14 @@ class GameEngine:
     #debug, show the grounded variable
     if self.grounded and pyxel.btn(pyxel.KEY_B):
       pyxel.text(self.cam[0],self.cam[1],'grounded',8)
+    #Ski soundda
+
     #death screen
     if self.dead:
       self.player_pos[4]=max(0,self.player_pos[4]-0.1)
       pyxel.blt(self.cam[0]+self.screen_size[0]/2-33,self.cam[1]+20,1,0,16,48,16,0)
       pyxel.text(self.cam[0]+self.screen_size[0]/2-55,self.cam[1]+40,"Press Space to restart",8)
 
-        
 
  
   def obstacles_draw(self):
@@ -502,18 +536,19 @@ class GameEngine:
           y=pointA[1]+down_distance
 
           #main snow layers
-          pyxel.rect(int((x+pointA[0])/10),int(y/10),1,5,7)
-          pyxel.rect(int((x+pointA[0])/10),int(y/10)+5,1,300,6)
+          pyxel.rect(int((x+pointA[0])/10),int(y/10),1,5,self.colors[1])
+          pyxel.rect(int((x+pointA[0])/10),int(y/10)+5,1,300,self.colors[2])
 
           #dithering between the two snow layers
           if not int((x+pointA[0])/10)%2==0:
-            pyxel.pset(int((x+pointA[0])/10),int(y/10)+5,7)
+            pyxel.pset(int((x+pointA[0])/10),int(y/10)+5,self.colors[1])
           else:
-            pyxel.pset(int((x+pointA[0])/10),int(y/10)+6,7)  
+            pyxel.pset(int((x+pointA[0])/10),int(y/10)+6,self.colors[1])  
 
   def snow_draw(self):
     """does everything related to snowflakes.
-    """    
+    """
+    
     self.snow_flake_list.append([pyxel.rndi(30,286)+self.cam[0],pyxel.rndi(-30,98)+self.cam[1],pyxel.rndi(100,150),pyxel.rndi(1,3)])
     to_be_deleted=[]
     for i in range(len(self.snow_flake_list)): #each snowflake in the list
@@ -573,6 +608,14 @@ class obstacle:
       self.hitbox=[x+6,y+0,x+10,y+16]
       self.texture_info=[0,16,16,16]
       self.texture_overlay=[0,0,0,0]
+    if type=='palmtree':
+      self.hitbox=[x+6,y+0,x+10,y+16]
+      self.texture_info=[0,96,16,16]
+      self.texture_overlay=[0,0,0,0]
+    if type=='cactus':
+      self.hitbox=[x+6,y+0,x+10,y+16]
+      self.texture_info=[16,96,16,16]
+      self.texture_overlay=[0,0,0,0]
 
 
   def shiver(self):
@@ -612,7 +655,6 @@ class Custom:
     self.ondeath=ondeath
     self.const=constant
     for i in range(len(app.menu.cases_shop)):
-      if app.menu.cases_shop[i][0]==self.name: 
-        print()
+      if app.menu.cases_shop[i][0]==self.name:
         self.texture=[(i%7)*16,int(i/7)*32,1]
 
