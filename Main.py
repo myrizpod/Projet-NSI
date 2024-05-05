@@ -25,6 +25,8 @@ class App:
         pyxel.run(self.update, self.draw)     
 
     def draw(self):
+        
+        print(self.best_score)
         #choose wether or not menu should be shown
         game.game_draw()
         if not self.inGame:

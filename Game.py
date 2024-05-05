@@ -49,7 +49,7 @@ class GameEngine:
     self.score=0 #score of the player
     self.pieces=0 #number of coins of the player
     self.coin_distance=0 #current distance between screen border and last coin patch
-    self.coin_distance_min=300 #minimum distance between two coin patches
+    self.coin_distance_min=100 #minimum distance between two coin patches
     self.is_paused=False #defines wether the game is paused or not
     self.cam_offset=[self.screen_size[0]/2-20,50] #offset of the camera with the player
     self.coin_mult=0 #current coin multiplicator
@@ -59,7 +59,7 @@ class GameEngine:
     self.double_jump=False #is next jump a double jump?
     self.dash=False #is next jump a dash?
     self.jump_boost_timer=0 #time left for jump boost
-    self.effects=effects #mettre les capacités que l'on veut avoir pendant la partie("no_flip","dash","double_jump","")
+    self.effects=effects #give the effects to the player examples:("no_flip","dash","double_jump","")
     self.dashed=False #True the frame after the dash, else false (for fancy trail)
     self.speed_bonus=0 #a bonus speed that is added to the current player speed
     self.gained_bonus_score=0 #how much bonus score did the player gain this frame
@@ -117,7 +117,7 @@ class GameEngine:
     self.obstacle_distance+=self.player_pos[4]
     if self.obstacle_distance>self.obstacle_distance_min and random.random()<0.02*self.player_pos[4]:
       self.obstacle_distance=0
-      self.coin_distance=100
+      self.coin_distance=80
       #calculate obstacle position
       pointA,pointB=self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])-1],self.terrain[self.find_next_point(self.player_pos[0]+self.screen_size[0])]
       y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0])*10),pointA,pointB)/10)
@@ -145,7 +145,7 @@ class GameEngine:
     self.coin_distance+=self.player_pos[4]
     if self.coin_distance>self.coin_distance_min and random.random()<0.02*self.player_pos[4]:
       self.coin_distance=0
-      self.obstacle_distance=50
+      self.obstacle_distance=100
       #spawns multiple coins at once to make a patch
       for i in range(0,random.randint(3,10)*8,8):
         #calculate obstacle position
@@ -225,6 +225,7 @@ class GameEngine:
     mostly changing screen color
     """
     self.app.total_coins+=self.pieces
+    self.app.best_score=max(int(self.score/10),self.app.best_score)
     self.dead=True
     pyxel.pal(5,2)
     pyxel.pal(7,15)
