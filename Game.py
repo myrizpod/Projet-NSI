@@ -96,21 +96,23 @@ class GameEngine:
     #update score, quicker = more score/iteration
     if not self.dead and "score boost X1" in self.effects:
       self.score+=self.player_pos[4]
-    elif "score boost X1.1" in self.effects:
+    elif not self.dead and "score boost X1.1" in self.effects:
       self.score+=self.player_pos[4]*1.1
-    elif "score boost X1.2" in self.effects:
+    elif not self.dead and "score boost X1.2" in self.effects:
       self.score+=self.player_pos[4]*1.2
-    elif "score boost X1.3" in self.effects:
+    elif not self.dead and "score boost X1.3" in self.effects:
       self.score+=self.player_pos[4]*1.3
-    elif "score boost X1.4" in self.effects:
+    elif not self.dead and "score boost X1.4" in self.effects:
       self.score+=self.player_pos[4]*1.4
-    elif "score boost X1.5" in self.effects:
+    elif not self.dead and "score boost X1.5" in self.effects:
       self.score+=self.player_pos[4]*1.5
-    elif "score boost X1.6" in self.effects:
+    elif not self.dead and "score boost X1.6" in self.effects:
       self.score+=self.player_pos[4]*1.6
+    else:
+      self.score+=self.player_pos[4]
     if not self.dead:
       self.player_pos[4]=max(self.player_pos[4],self.score/2500) #adjust speed
-    #remove unused terrain points (behind the player)-
+    #remove unused terrain points (behind the player)
     if self.terrain[1][0]+self.cam_offset[0]*10+100<self.player_pos[0]*10:
       self.terrain.pop(0)
       #update player nearest terrain point
@@ -166,20 +168,20 @@ class GameEngine:
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns all the types of coins
         r=random.random()
-        if r<0.05 and "Magnet" in self.effects or "Froggy" in self.effects or "Shield" in self.effects or "Coins X2" in self.effects :
+        if r<0.05 and ( "Magnet" in self.effects or "Froggy" in self.effects or "Shield" in self.effects or "Coins X2" in self.effects) :
           r=random.random()
           if r<=0.16 and "Magnet" in self.effects:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet"))
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet")) #magnet
           elif 0.16<r<=0.32 and "Froggy" in self.effects:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost")) #jump boost
           elif 0.32<r<=0.48 and "Shield" in self.effects:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible")) 
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible")) #invincibility
           elif 0.48<r<=0.64 and "Coins X2" in self.effects: 
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double")) #double coins
         elif r<0.15 and "Coin +5" in self.effects:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #blue coin
-        elif 0.20>r>=0.15 and not "no bomb" in self.effects:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
+        elif r<0.2 and not "no bomb" in self.effects:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb")) #bomb
         else:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #yellow coin
 
@@ -201,32 +203,32 @@ class GameEngine:
         self.dead=False
     
     #jump
-    if pyxel.btnp(pyxel.KEY_SPACE) and not self.dead:
-      if not self.grounded:
+    if pyxel.btnp(pyxel.KEY_SPACE) and not self.dead: #check if player is trying to jump
+      if not self.grounded: #conditions for air control (dash/double jump)
         if self.double_jump and "double_jump" in self.effects:
-          self.player_pos[3]=-1.5
-          self.double_jump=False
+          self.player_pos[3]=-1.5 #upward momentum
+          self.double_jump=False #cannot double jump anymore
         if self.dash and "dash" in self.effects:
-          self.dashed=True
-          self.cam_offset[0]+=int(25*self.player_pos[4])
-          self.dash=False
+          self.dashed=True #for the trail
+          self.cam_offset[0]+=int(25*self.player_pos[4]) #moves the camera backward so it ease in position instead of teleporting
+          self.dash=False #cannot dash anymore
 
 
-      else:
+      else: #if grounded
         if "double_jump" in self.effects:
-          self.double_jump=True
+          self.double_jump=True #next air space press will be a double jump
         if "dash" in self.effects:
-          self.dash=True
-        self.player_pos[3]=-2
-        if self.jump_boost_timer>0:
-          self.player_pos[3]=-3
+          self.dash=True #next air space press will be a dash
+        self.player_pos[3]=-2 #upward momentum
+        if self.jump_boost_timer>0: #jump
+          self.player_pos[3]=-3 #higher upward momentum
     
 
     
-    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded and "flip" in self.effects:
-      self.pdir=(self.pdir+0.15)%8 
+    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded and "flip" in self.effects: #checks if player is trying and allowed to flip
+      self.pdir=(self.pdir+0.15)%8 #slowly rotates the player
 
-       
+      #Go to def for more info
     self.detect_collisions_obstacles()
     self.detect_collision_coins()  
 
@@ -238,6 +240,7 @@ class GameEngine:
     mostly changing screen color
     """
     self.app.total_coins+=self.pieces
+    self.app.menu.target_coins=self.app.total_coins
     self.app.best_score=max(int(self.score/10),self.app.best_score)
     self.dead=True
     pyxel.pal(5,2)
@@ -316,6 +319,16 @@ class GameEngine:
     return i
 
   def terrain_y(self,x,pointA,pointB):
+    """Calculates the y position of the terrain given the x position and the terrain point interval it should be in.
+
+    Args:
+        x (int): the position you want the y of
+        pointA (pos list [int,int]): first point before x
+        pointB (pos list [int,int]): first point after x
+
+    Returns:
+        int: the y position
+    """
     return (pointB[1]-pointA[1])*((math.cos(((x/(pointB[0]-pointA[0]))*math.pi)-math.pi)+1)/2)  
 
 
@@ -392,11 +405,8 @@ class GameEngine:
       pyxel.text(self.cam[0]+2,self.cam[1]+1,"Coins: "+str(self.pieces),self.colors[4])
       pyxel.text(self.cam[0]+1,self.cam[1]+1,"Coins: "+str(self.pieces),self.colors[5])
       #score counter
-      if "score_boost" in self.effects:
-        pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[4])
-        pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[6])
 
-      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),1)
+      pyxel.text(self.cam[0]+self.screen_size[0]-20-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[4])
       pyxel.text(self.cam[0]+self.screen_size[0]-21-len(str(int(self.score)))*4,self.cam[1]+1,'score:'+str(int(self.score/10)),self.colors[6])
 
     if self.theme=="snowy": #only generate snow if theme is snowy
@@ -500,17 +510,11 @@ class GameEngine:
     pyxel.blt(self.player_pos[0], self.player_pos[1], 2,self.ski.texture[0]+rotframes[int(self.pdir)][0],self.ski.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
     #Player
     pyxel.blt(self.player_pos[0]+xdis, self.player_pos[1]+ydis, 2,self.player.texture[0]+rotframes[int(self.pdir)][0],self.player.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
-    #Scarf
-    pyxel.blt(self.player_pos[0], self.player_pos[1], 2,self.scarf.texture[0]+rotframes[int(self.pdir)][0],self.scarf.texture[1]+rotframes[int(self.pdir)][1], 8, 8, 0)
     if pyxel.btn(pyxel.KEY_B):  
         pyxel.rectb(self.player_pos[0],self.player_pos[1],8,8,11)
  
   def draw_scarf(self,col1):
       """draws the player's scarf
-     
-      !!To do:
-        make the scarf use 2 colors
-
       Args:
           col1 (int [0,15]): scarf color
       """
@@ -670,5 +674,7 @@ class Custom:
     self.const=constant
     for i in range(len(app.menu.cases_shop)):
       if app.menu.cases_shop[i][0]==self.name:
-        self.texture=[(i%7)*16,int(i/7)*32,1]
+        self.texture=[(i%7)*16,int(i/7)*32]
+        if "scarf" in self.name:
+          self.texture.append([1,6,10,9,8,3,11][i-14])
 

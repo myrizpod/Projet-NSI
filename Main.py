@@ -2,6 +2,7 @@ from Game import *
 from Menu import *
 import pyxel
 import Save
+import music #play music
 #Global variables
 
 class App:
@@ -39,10 +40,9 @@ class App:
             effects=[]
             for i in range(len(self.menu.cases_shop)):
                 if self.menu.cases_shop[i][0]==self.menu.selected_skin or self.menu.cases_shop[i][0]==self.menu.selected_ski:
-                    try: #avoid errors with objects that dont give any effects
-                        effects+=self.menu.cases_shop[i][3].split("/")
-                    except:
-                        pass
+                    effects+=self.menu.cases_shop[i][3].split("/")
+                if self.menu.cases_shop[i][0]==self.menu.selected_object:
+                    effects.append(self.menu.cases_shop[i][0])
             print(effects)
             game.__init__(self.screen_size,self,skin=self.menu.selected_skin,scarf=self.menu.selected_scarf,ski=self.menu.selected_ski,theme=self.mode,effects=effects,not_in_menu=True)
         self.p_inGame=self.inGame
