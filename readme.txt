@@ -7,6 +7,8 @@ Required files:
 -Save.py
 -Save.csv
 -textures.pyxres
+-music.py
+-loop.wav
 
 To start the game simply launch Main.py (in VScode or something)
 
@@ -20,9 +22,12 @@ How to play:
 -Bombs can spawn hidden with coins, try to avoid them!
 
 -Objects will rarely spawn with coins when bought and have different effects when picked up: 
--Shield makes you invincible to obstacles for 5 sec
-- +5 blue coins
--
--
--
--
+shield for 5 seconds
+jumps higher for 5 seconds
+spawns coins with a value of 5
+spawns coins that double the coins you take
+a magnet that attracts coins and more...
+
+Try to get the best_score which is saved but be careful you need to press q to leave the game or else 
+it will not save it.
+If you manage to buy the golden trophy, you can consider yourself the best skier of ski adventure!
