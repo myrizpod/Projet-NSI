@@ -94,7 +94,20 @@ class GameEngine:
     self.cam_offset[0]=max(30,self.cam_offset[0]-self.cam_offset[0]/50)
     
     #update score, quicker = more score/iteration
-    self.score+=self.player_pos[4]
+    if not self.dead and "score boost X1" in self.effects:
+      self.score+=self.player_pos[4]
+    elif "score boost X1.1" in self.effects:
+      self.score+=self.player_pos[4]*1.1
+    elif "score boost X1.2" in self.effects:
+      self.score+=self.player_pos[4]*1.2
+    elif "score boost X1.3" in self.effects:
+      self.score+=self.player_pos[4]*1.3
+    elif "score boost X1.4" in self.effects:
+      self.score+=self.player_pos[4]*1.4
+    elif "score boost X1.5" in self.effects:
+      self.score+=self.player_pos[4]*1.5
+    elif "score boost X1.6" in self.effects:
+      self.score+=self.player_pos[4]*1.6
     if not self.dead:
       self.player_pos[4]=max(self.player_pos[4],self.score/2500) #adjust speed
     #remove unused terrain points (behind the player)-
