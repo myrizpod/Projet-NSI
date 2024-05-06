@@ -180,7 +180,7 @@ class GameEngine:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double")) #double coins
         elif r<0.15 and "Coin +5" in self.effects:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #blue coin
-        elif r<0.2 and not "no bomb" in self.effects:
+        elif r<0.12 and not "no bomb" in self.effects:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb")) #bomb
         else:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #yellow coin
