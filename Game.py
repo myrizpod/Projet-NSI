@@ -153,20 +153,20 @@ class GameEngine:
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns all the types of coins
         r=random.random()
-        if r<0.05:
+        if r<0.05 and "Magnet" in self.effects or "Froggy" in self.effects or "Shield" in self.effects or "Coins X2" in self.effects or :
           r=random.random()
-          if r<=0.16:
+          if r<=0.16 and "Magnet" in self.effects:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet"))
-          elif 0.16<r<=0.32:
+          elif 0.16<r<=0.32 and "Froggy" in self.effects:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
-          elif 0.32<r<=0.48:
+          elif 0.32<r<=0.48 and "Shield" in self.effects:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible")) 
-          elif 0.48<r<=0.64: 
+          elif 0.48<r<=0.64 and "Coins X2" in self.effect: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
-          elif r>=0.64:
-            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
-        elif r<0.15:
+        elif r<0.15 and "Coin +5" in self.effects:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #blue coin
+        elif 0.20>r>=0.15 and not "no bomb" in self.effects:
+            self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="bomb"))
         else:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,1)) #yellow coin
 
@@ -195,7 +195,7 @@ class GameEngine:
           self.double_jump=False
         if self.dash and "dash" in self.effects:
           self.dashed=True
-          self.cam_offset[0]+=int(35*self.player_pos[4])
+          self.cam_offset[0]+=int(25*self.player_pos[4])
           self.dash=False
 
 
@@ -210,7 +210,7 @@ class GameEngine:
     
 
     
-    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded and "no_flip" not in self.effects:
+    if pyxel.btn(pyxel.KEY_SPACE) and not self.dead and not self.grounded and "flip" in self.effects:
       self.pdir=(self.pdir+0.15)%8 
 
        
@@ -279,7 +279,7 @@ class GameEngine:
                 self.magnet_timer=150
               coi.pickup()
               pyxel.play(1,2)
-              self.pieces=self.pieces+coi.value*self.coin_mult*2 if "double_coins" in self.effects else self.pieces+coi.value*self.coin_mult
+              self.pieces=self.pieces+coi.value*self.coin_mult*2 if "double_coin" in self.effects else self.pieces+coi.value*self.coin_mult
               break      
 
             
@@ -369,7 +369,7 @@ class GameEngine:
     if self.not_in_menu:
       if self.dashed:
         pyxel.play(2,3)
-        for i in range(int(35*self.player_pos[4])) :
+        for i in range(int(25*self.player_pos[4])) :
           self.player_pos[0]+=1
           self.draw_player()
         self.dashed=False  

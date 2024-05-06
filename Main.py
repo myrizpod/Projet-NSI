@@ -7,11 +7,7 @@ import Save
 class App:
 
     def __init__(self):
-        """
-        Initialising the whole game, calling the other modules
-        
-        """
-        global game #Game is global for ease of use
+        global game
         self.p_inGame=False
         self.inGame=False
         tmp=Save.load()
@@ -29,43 +25,35 @@ class App:
         pyxel.run(self.update, self.draw)  
 
     def draw(self):
-        """
-        Calls the right draw function
-        """
+        
         #choose wether or not menu should be shown
         game.game_draw()
         if not self.inGame:
             self.menu.menu_draw()
 
     def update(self):
-        """
-        Updates the whole game and manage pregame actions(when starting a new game)
-        """
         global game
         #switch between runing the menu and the game
-        #Does everything tied to starting a new game
         if self.p_inGame==False and self.inGame==True:
             self.mode=self.menu.mode
             effects=[]
             for i in range(len(self.menu.cases_shop)):
-                #Gives the effect of the skis and skins
                 if self.menu.cases_shop[i][0]==self.menu.selected_skin or self.menu.cases_shop[i][0]==self.menu.selected_ski:
-                    effects+=self.menu.cases_shop[i][3].split("/")
-                #Gives the effect of the objects
-                if self.menu.cases_shop[i][0]==self.menu.selected_object:
-                    effects.append(menu.cases_shop[i][0])
-            #Initialise the game
+                    try: #avoid errors with objects that dont give any effects
+                        effects+=self.menu.cases_shop[i][3].split("/")
+                    except:
+                        pass
+            print(effects)
             game.__init__(self.screen_size,self,skin=self.menu.selected_skin,scarf=self.menu.selected_scarf,ski=self.menu.selected_ski,theme=self.mode,effects=effects,not_in_menu=True)
         self.p_inGame=self.inGame
 
-        #used properly quit the game (used for save files) OTHERWISE NOTHING IS SAVED
+        #used properly quit the game (gonna use it for save files)
         if pyxel.btnp(pyxel.KEY_Q):
             print("Quitting")
             Save.save(self.best_score,self.total_coins,self.unlocked_items)
             Save.load()
             pyxel.quit()
 
-        #chose which file to run each game frame
         if self.inGame:
             game.game_update()
         else:
