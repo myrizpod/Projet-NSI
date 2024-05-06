@@ -613,7 +613,7 @@ class obstacle:
     self.shiver_time=10
     #defines the hitbox of each type of obstacle with:[hitbox_x,hitbox_y,hitbox_end_x,hitbox_end_y]
     #hitbox is relative to obstacle position
-    #definit des infos sur la texture dependant du type de l element selon: [X,Y,size_x,size_y]
+    #defines the elements of the textures in self.texture_info and self.texture_overlay following: [X,Y,size_x,size_y]
     if type=='rock':
       self.hitbox=[x+0,y+0,x+8,y+8]
       self.texture_info=[[8,0,8,8],[16,0,8,8],[8,8,8,8],[16,8,8,8]][self.variant]
@@ -651,6 +651,9 @@ class obstacle:
 
 class coin:
   def __init__(self,x,y,value,effect="coin"):
+    """
+    create a new coin at pos x,y with a specific effect and a value=how much you gain
+    """
     self.effect=effect
     self.pos=[x,y]
     self.value=value
@@ -667,11 +670,15 @@ class Custom:
   """
   The class for all custom modifiers like player, skis and scarf
   """
-  def __init__(self,app,name=None,ondeath=None,constant=None):
+  def __init__(self,app,name=None):
+    """_summary_
+
+    Args:
+        app (class Main): used to know where to get texture info from (from app.menu.cases_shop)
+        name (str, optional): the name of the object, used to find stuff like its texture/color . Defaults to None.
+    """
     self.name=name
     self.app=app
-    self.ondeath=ondeath
-    self.const=constant
     for i in range(len(app.menu.cases_shop)):
       if app.menu.cases_shop[i][0]==self.name:
         self.texture=[(i%7)*16,int(i/7)*32]
