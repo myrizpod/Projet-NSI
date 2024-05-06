@@ -153,7 +153,7 @@ class GameEngine:
         y=int(pointB[1]/10-self.terrain_y(pointB[0]-((self.player_pos[0]+self.screen_size[0]+i)*10),pointA,pointB)/10)
         #Randomly spawns all the types of coins
         r=random.random()
-        if r<0.05 and "Magnet" in self.effects or "Froggy" in self.effects or "Shield" in self.effects or "Coins X2" in self.effects or :
+        if r<0.05 and "Magnet" in self.effects or "Froggy" in self.effects or "Shield" in self.effects or "Coins X2" in self.effects :
           r=random.random()
           if r<=0.16 and "Magnet" in self.effects:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="magnet"))
@@ -161,7 +161,7 @@ class GameEngine:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="jump_boost"))
           elif 0.32<r<=0.48 and "Shield" in self.effects:
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="invincible")) 
-          elif 0.48<r<=0.64 and "Coins X2" in self.effect: 
+          elif 0.48<r<=0.64 and "Coins X2" in self.effects: 
             self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,0,effect="double"))
         elif r<0.15 and "Coin +5" in self.effects:
           self.coin_list.append(coin(self.player_pos[0]+246+i,y-8,5)) #blue coin
