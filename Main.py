@@ -2,7 +2,7 @@ from Game import *
 from Menu import *
 import pyxel
 import Save
-import music #play music
+import music
 #Global variables
 
 class App:
@@ -13,6 +13,7 @@ class App:
         self.inGame=False
         tmp=Save.load()
         self.mode="snowy"
+        music.pla
         self.total_coins=int(tmp["coins"])
         self.best_score=int(tmp["best_score"])
         tmp=tmp["unlocked_items"][1:-1].split(",")#Selection of the list (trunc to get the useful part) with the unlocked items and split it
