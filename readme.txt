@@ -12,13 +12,20 @@ Required files:
 
 To start the game simply launch Main.py (in VScode or something)
 
+Must have:
+ - python library pyxel installed
+ - python library winsound installed
+ - python library time installed
+ - python library math installed
+ - python library random installed
+
 How to play:
 -Pressing START launches a new game
 -Your Only control is the space bar: It allows you to jump/flip/dash depending on your abilities.
 -Avoid obstacles
 -Speed slowly increase
 -If you can flip, make sure not to hit the ground upside down, otherwise, you also die!
--Once you collect enough coins, you can buy items in the shop ande equip them.
+-Once you collect enough coins, you can buy items in the shop and equip them.
 -Bombs can spawn hidden with coins, try to avoid them!
 
 -Objects will rarely spawn with coins when bought and have different effects when picked up: 
