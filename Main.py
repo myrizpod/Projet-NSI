@@ -13,7 +13,7 @@ class App:
         self.inGame=False
         tmp=Save.load()
         self.mode="snowy"
-        music.play_music()
+        music.play_music(2)
         self.total_coins=int(tmp["coins"])
         self.best_score=int(tmp["best_score"])
         tmp=tmp["unlocked_items"][1:-1].split(",")#Selection of the list (trunc to get the useful part) with the unlocked items and split it
