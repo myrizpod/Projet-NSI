@@ -8,7 +8,8 @@ Required files:
 -Save.csv
 -textures.pyxres
 -music.py
--loop.wav
+# the music folder from
+https://drive.google.com/drive/folders/1uM1DldVnHOW-NyR4o0SpiTgeug3faBdl?usp=sharing
 
 To start the game simply launch Main.py (in VScode or something)
 
