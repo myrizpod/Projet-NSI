@@ -1,5 +1,5 @@
 import pyxel
-
+import music
 class MenuEngine:
     #Everything related to the menu
     def __init__(self,app):
@@ -274,14 +274,18 @@ class MenuEngine:
         if self.screensize[0]-98 <= pyxel.mouse_x <= self.screensize[0]-93 and self.screensize[1]-54 <= pyxel.mouse_y <= self.screensize[1]-49:
             pyxel.rect(self.screensize[0]-96,self.screensize[1]-54,2,6,self.all_colours[self.mode]["settings graphics"]["clicked volume buttons color"])#vertical line of the "+"
             pyxel.rect(self.screensize[0]-98,self.screensize[1]-52,6,2,self.all_colours[self.mode]["settings graphics"]["clicked volume buttons color"])#horyzontal line of the "+"
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume<7: self.global_volume+=1
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume<7:
+                self.global_volume+=1
+                music.update_sound_effects(self.global_volume)
         else:
             pyxel.rect(self.screensize[0]-96,self.screensize[1]-54,2,6,self.all_colours[self.mode]["settings graphics"]["volume buttons color"])#vertical line of the "+"
             pyxel.rect(self.screensize[0]-98,self.screensize[1]-52,6,2,self.all_colours[self.mode]["settings graphics"]["volume buttons color"])#horyzontal line of the "+"
         #"-" button
         if self.screensize[0]-88 <= pyxel.mouse_x <= self.screensize[0]-85 and self.screensize[1]-52 <= pyxel.mouse_y <= self.screensize[1]-51:
             pyxel.rect(self.screensize[0]-88,self.screensize[1]-52,4,2,self.all_colours[self.mode]["settings graphics"]["clicked volume buttons color"])#line of the "-"
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume>0: self.global_volume-=1
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.global_volume>0:
+                self.global_volume-=1
+                music.update_sound_effects(self.global_volume)
         else:
             pyxel.rect(self.screensize[0]-88,self.screensize[1]-52,4,2,self.all_colours[self.mode]["settings graphics"]["volume buttons color"])#line of the "-"
 
@@ -301,14 +305,18 @@ class MenuEngine:
         if self.screensize[0]-97 <= pyxel.mouse_x <= self.screensize[0]-92 and self.screensize[1]-43 <= pyxel.mouse_y <= self.screensize[1]-38:
             pyxel.rect(self.screensize[0]-95,self.screensize[1]-43,2,6,self.all_colours[self.mode]["settings graphics"]["clicked volume buttons color"])#vertical line of the "+"
             pyxel.rect(self.screensize[0]-97,self.screensize[1]-41,6,2,self.all_colours[self.mode]["settings graphics"]["clicked volume buttons color"])#horyzontal line of the "+"
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume<7: self.music_volume+=1
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume<7:
+                self.music_volume+=1
+                music.update_music(self.music_volume)
         else:
             pyxel.rect(self.screensize[0]-95,self.screensize[1]-43,2,6,self.all_colours[self.mode]["settings graphics"]["volume buttons color"])#vertical line of the "+"
             pyxel.rect(self.screensize[0]-97,self.screensize[1]-41,6,2,self.all_colours[self.mode]["settings graphics"]["volume buttons color"])#horyzontal line of the "+"
         #"-" button
         if self.screensize[0]-87 <= pyxel.mouse_x <= self.screensize[0]-84 and self.screensize[1]-41 <= pyxel.mouse_y <= self.screensize[1]-40:
             pyxel.rect(self.screensize[0]-87,self.screensize[1]-41,4,2,self.all_colours[self.mode]["settings graphics"]["clicked volume buttons color"])#line of the "-"
-            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume>0: self.music_volume-=1
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.music_volume>0:
+                self.music_volume-=1
+                music.update_music(self.music_volume)
         else:
             pyxel.rect(self.screensize[0]-87,self.screensize[1]-41,4,2,self.all_colours[self.mode]["settings graphics"]["volume buttons color"])#line of the "-"
 
