@@ -1,6 +1,5 @@
 import winsound
 import pyxel
-from pydub import AudioSegment
 
 def play_music(vol):
     winsound.PlaySound("sound_folder/"+str(vol)+".wav",winsound.SND_LOOP+winsound.SND_ASYNC)
