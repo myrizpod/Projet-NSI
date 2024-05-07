@@ -1,17 +1,5 @@
 
-
-"""
-Notes about the project ( bugs and other...):
--there's an issue with obstacle generation when the player is too fast
-
-
-"""
 #info and imports
-print("Launched Ü")
-print("Press Q to quit (and save info)")
-print("Press P to pause the game")
-print("Press space to restart")
-
 import pyxel
 import time
 import math
@@ -232,12 +220,12 @@ class GameEngine:
     self.detect_collisions_obstacles()
     self.detect_collision_coins()  
 
-    if self.dead:
+    if self.dead: #tells the Main that the player is dead
       return True
   
   def die(self):
     """
-    mostly changing screen color
+    mostly changing screen color as well as storing score and coins into Main
     """
     self.app.total_coins+=self.pieces
     self.app.menu.target_coins=self.app.total_coins
@@ -252,7 +240,7 @@ class GameEngine:
     Detects collisions between the player's hitbox and the obstacles' hitbox and kills the player
     if the player's hitbox touches it.
     """
-    if not self.dead:
+    if not self.dead: #dont collide with obstacles
       for o in range(len(self.obstacle_list)):
         obs=self.obstacle_list[o]
         for i in range(0,9):
